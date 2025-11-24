@@ -12,7 +12,7 @@ import SparePart from "../pages/SparePart.jsx";
 import MouldSummary from "../pages/MouldSummary.jsx";
 import HCHistory from "../pages/MouldMaintenanceHistory/HCHistory.jsx";
 import MouldBreakdownHistory from "../pages/MouldMaintenanceHistory/BreakDownHistory.jsx";
-import MouldSparePartHistory from "../pages/MouldMaintenanceHistory/SparePartHistory.jsx";
+import SparePartHistory from "../pages/MouldMaintenanceHistory/SparePartHistory.jsx";
 
 export default function AppRoutes() {
   return (
@@ -92,10 +92,10 @@ export default function AppRoutes() {
       />
 
       <Route
-        path="/MouldSparePartHistory"
+        path="/SparePartHistory"
         element={
           <PrivateRoute>
-            <MouldSparePartHistory />
+            <SparePartHistory />
           </PrivateRoute>
         }
       />
