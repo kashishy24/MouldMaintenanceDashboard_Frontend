@@ -246,7 +246,7 @@ function Sidebar({
               </SidebarLinkGroup>
 
               {/* spare Part   */}
-              <SidebarLinkGroup activecondition={pathname.includes("SparePart")}>
+              {/* <SidebarLinkGroup activecondition={pathname.includes("SparePart")}>
                 {(handleClick, open) => (
                     <NavLink
                       end
@@ -274,7 +274,7 @@ function Sidebar({
                     </NavLink>
                 )}
                 
-              </SidebarLinkGroup>
+              </SidebarLinkGroup> */}
 
               {/* Mould  Summary  */}
               <SidebarLinkGroup activecondition={pathname.includes("MouldSummary")}>
