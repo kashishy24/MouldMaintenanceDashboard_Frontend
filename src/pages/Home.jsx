@@ -252,19 +252,17 @@ export default function Home() {
           usedQty: r.UsedQty ?? r.UsedQuantity ?? "-", // if backend provides used qty use it, otherwise leave '-'
           location: r.SparePartLoc ?? r.Location ?? "-",
           lastUpdated: r.LastUpdatedTime ?? r.LastUpdatedDate ?? null,
-          // status: r.SparePartStatus ?? null
-          // status: r.SparePartStatus ?? null
-//status: r.SparePartStatus === 1 ? "Normal" : r.SparePartStatus === 2 ? "Warning" : r.SparePartStatus === 3 ? "Alarm"
-status:
-  r.SparePartStatus === 1
-    ? "Normal"
-    : r.SparePartStatus === 2
-      ? "Warning"
-      : r.SparePartStatus === 3
-        ? "Alarm"
-        : "Unknown",
-        
-}));
+
+          status:
+            r.SparePartStatus === 1
+              ? "Normal"
+              : r.SparePartStatus === 2
+                ? "Warning"
+                : r.SparePartStatus === 3
+                  ? "Alarm"
+                  : "Unknown",
+
+        }));
         setSpareParts(formatted);
       } catch (err) {
         console.error("SparePart API Error:", err);
@@ -459,8 +457,8 @@ status:
                       <th className="p-2">Available Qty</th>
                       <th className="p-2">Used Qty</th>
                       <th className="p-2">Location</th>
-                         <th className="p-2">Spare Part Status</th>
-                          <th className="p-2">Last Updated Time</th>
+                      <th className="p-2">Spare Part Status</th>
+                      <th className="p-2">Last Updated Time</th>
                     </tr>
                   </thead>
                   <tbody>
