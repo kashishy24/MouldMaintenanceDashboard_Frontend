@@ -18,6 +18,8 @@ const top10Reasons = [
   { reason: "Thermo couple", Duration: 76 },
   { reason: "Heater", Duration: 54 },
   { reason: "Ejector Pin", Duration: 34 },
+    { reason: "Thermo 2", Duration: 76 },
+  { reason: "Heater 3", Duration: 54 },
 ];
 
 // ---------------- MAIN COMPONENT ----------------
@@ -29,9 +31,11 @@ const BreakDownHistory = () => {
   const [rangeEnd, setRangeEnd] = useState("");
 
   const [chartData, setChartData] = useState([
-    { date: "2024-01-01", Duration: 40, Occurence: 5 },
-    { date: "2024-01-02", Duration: 75, Occurence: 10 },
-    { date: "2024-01-03", Duration: 55, Occurence: 7 },
+    { date: "2025-11-01", Duration: 40, Occurence: 5 },
+    { date: "2025-11-02", Duration: 75, Occurence: 10 },
+    { date: "2025-11-03", Duration: 55, Occurence: 7 },
+      { date: "2025-11-04", Duration: 40, Occurence: 5 },
+    { date: "2025-11-05", Duration: 75, Occurence: 10 },
   ]);
 
   const [tableData] = useState([
@@ -46,6 +50,60 @@ const BreakDownHistory = () => {
     },
     {
       BreakDownID: 2,
+      Reason: "Heater Fault",
+      Remark: "Low temp",
+      MouldName: "Mould-45",
+      StartTime: "2024-01-03 09:00",
+      EndTime: "2024-01-03 11:20",
+      Duration: "140 min",
+    },
+    {
+      BreakDownID: 3,
+      Reason: "Heater Fault",
+      Remark: "Low temp",
+      MouldName: "Mould-45",
+      StartTime: "2024-01-03 09:00",
+      EndTime: "2024-01-03 11:20",
+      Duration: "140 min",
+    },
+    {
+      BreakDownID: 4,
+      Reason: "Heater Fault",
+      Remark: "Low temp",
+      MouldName: "Mould-45",
+      StartTime: "2024-01-03 09:00",
+      EndTime: "2024-01-03 11:20",
+      Duration: "140 min",
+    },
+    {
+      BreakDownID: 5,
+      Reason: "Heater Fault",
+      Remark: "Low temp",
+      MouldName: "Mould-45",
+      StartTime: "2024-01-03 09:00",
+      EndTime: "2024-01-03 11:20",
+      Duration: "140 min",
+    },
+    {
+      BreakDownID: 6,
+      Reason: "Heater Fault",
+      Remark: "Low temp",
+      MouldName: "Mould-45",
+      StartTime: "2024-01-03 09:00",
+      EndTime: "2024-01-03 11:20",
+      Duration: "140 min",
+    },
+    {
+      BreakDownID: 7,
+      Reason: "Heater Fault",
+      Remark: "Low temp",
+      MouldName: "Mould-45",
+      StartTime: "2024-01-03 09:00",
+      EndTime: "2024-01-03 11:20",
+      Duration: "140 min",
+    },
+    {
+      BreakDownID: 8,
       Reason: "Heater Fault",
       Remark: "Low temp",
       MouldName: "Mould-45",
@@ -91,9 +149,26 @@ const BreakDownHistory = () => {
 
   const loadDayWiseData = () => {
     setChartData([
-      { date: "2024-01-01", Duration: 60, Occurence: 7 },
-      { date: "2024-01-02", Duration: 40, Occurence: 3 },
-      { date: "2024-01-03", Duration: 90, Occurence: 9 },
+      { date: "2025-11-01", Duration: 60, Occurence: 7 },
+      { date: "2025-11-02", Duration: 40, Occurence: 3 },
+      { date: "2025-11-03", Duration: 90, Occurence: 9 },
+         { date: "2025-11-04", Duration: 60, Occurence: 7 },
+      { date: "2025-11-05", Duration: 40, Occurence: 3 },
+      { date: "2025-11-06", Duration: 90, Occurence: 9 },
+       { date: "2025-11-07", Duration: 90, Occurence: 9 },
+         { date: "2025-11-08", Duration: 60, Occurence: 7 },
+      { date: "2025-11-09", Duration: 40, Occurence: 3 },
+      { date: "2025-11-10", Duration: 90, Occurence: 9 },
+       { date: "2025-11-11", Duration: 90, Occurence: 9 },
+         { date: "2025-11-12", Duration: 60, Occurence: 7 },
+      { date: "2025-11-13", Duration: 40, Occurence: 3 },
+      { date: "2025-11-14", Duration: 90, Occurence: 9 },
+       { date: "2025-11-15", Duration: 40, Occurence: 3 },
+      { date: "2025-11-16", Duration: 90, Occurence: 9 },
+       { date: "2025-11-17", Duration: 90, Occurence: 9 },
+         { date: "2025-11-18", Duration: 60, Occurence: 7 },
+      { date: "2025-11-19", Duration: 40, Occurence: 3 },
+      { date: "2025-11-20", Duration: 90, Occurence: 9 },
     ]);
   };
 
@@ -151,30 +226,86 @@ const BreakDownHistory = () => {
 
 
         {/* ---------------------- CHART ---------------------- */}
-        <div className="w-full h-80 bg-white rounded-xl shadow-md p-5 mb-10">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
 
-              <XAxis
-                dataKey={
-                  grouping === "shift"
-                    ? "shift"
-                    : grouping === "day"
-                    ? "date"
-                    : "month"
-                }
-              />
+<div className="grid grid-cols-1 gap-5 mt-10">
 
-              <YAxis />
-              <Tooltip />
-              <Legend />
+  {/* Duration Chart */}
+  <div className="h-80 bg-white rounded-xl shadow-md p-10 ml-10 mb-10">
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={chartData}>
+        <CartesianGrid strokeDasharray="3 3" />
 
-              <Bar dataKey="Duration" fill="#1E3A8A" />
-              <Bar dataKey="Occurence" fill="#F97316" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        {/* X-axis → DATE */}
+        <XAxis 
+          dataKey={
+            grouping === "shift"
+              ? "shift"
+              : grouping === "day"
+              ? "date"
+              : "month"
+          }
+          tick={{ fontSize: 12 ,fill: "#000000ff",fontWeight: "bold"}}
+  interval={0}        
+  angle={-45}         
+  textAnchor="end"     
+  height={60}           
+/>
+
+        {/* Y-axis → DURATION */}
+        <YAxis
+          type="number"
+         tick={{ fontSize: 12 ,fill: "#000000ff",fontWeight: "bold"}}
+           width={80}        
+  tickMargin={10}
+        />
+
+        <Tooltip />
+
+        <Bar dataKey="Duration" fill="#4b81abff" barSize={35} radius={[5, 5, 5, 5]} />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+
+  {/* Occurrence Chart */}
+  <div className="h-90 bg-white rounded-xl shadow-md p-8 ml-10 mb-10">
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={chartData}>
+        <CartesianGrid strokeDasharray="3 3" />
+
+        {/* X-axis → DATE */}
+        <XAxis 
+          dataKey={
+            grouping === "shift"
+              ? "shift"
+              : grouping === "day"
+              ? "date"
+              : "month"
+          }
+           tick={{ fontSize: 12 ,fill: "#000000ff",fontWeight: "bold"}}
+          interval={0}        
+  angle={-45}         
+  textAnchor="end"     
+  height={60}  
+        />
+
+        {/* Y-axis → OCCURRENCES */}
+        <YAxis
+          type="number"
+       tick={{ fontSize: 12 ,fill: "#000000ff",fontWeight: "bold"}}
+           width={80}          // <-- ⭐ labels cut na ho iske liye width badha di
+  tickMargin={10}
+        />
+
+        <Tooltip />
+
+        <Bar dataKey="Occurence" fill="#f97316" barSize={35} radius={[5, 5, 5, 5]} />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+
+</div>
+
+
 
 
         {/* ---------------------- SUMMARY CARDS ---------------------- */}
@@ -198,7 +329,7 @@ const BreakDownHistory = () => {
 
         {/* ---------------------- TOP 10 BAR ---------------------- */}
         <div className="bg-white shadow-md rounded-md p-2 mb-4">
-          <h3 className="font-semibold mb-2 text-center">Top 10 Breakdown By Reason</h3>
+          <h3 className="font-semibold mb-2 text-center">Top 5 Breakdown By Reason</h3>
 
           <ResponsiveContainer width="100%" height={260}>
             <BarChart
@@ -207,8 +338,8 @@ const BreakDownHistory = () => {
               margin={{ top: 10, right: 30, left: 20, bottom: 10 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis dataKey="reason" type="category" />
+              <XAxis type="number"  tick={{ fontSize: 12 ,fill: "#000000ff",fontWeight: "bold"}} />
+              <YAxis dataKey="reason" type="category"  tick={{ fontSize: 15 ,fill: "#000000ff",fontWeight: "bold"}} />
               <Tooltip />
               <Legend />
               <Bar dataKey="Duration" fill="#2f72bd" barSize={20} />
@@ -236,13 +367,13 @@ const BreakDownHistory = () => {
             <tbody>
               {tableData.map((r, index) => (
                 <tr key={index} className="hover:bg-gray-100">
-                  <td className="p-2 border">{r.BreakDownID}</td>
-                  <td className="p-2 border">{r.Reason}</td>
-                  <td className="p-2 border">{r.Remark}</td>
-                  <td className="p-2 border">{r.MouldName}</td>
-                  <td className="p-2 border">{r.StartTime}</td>
-                  <td className="p-2 border">{r.EndTime}</td>
-                  <td className="p-2 border">{r.Duration}</td>
+                  <td className="p-2 border text-center font-bold text-blue-900">{r.BreakDownID}</td>
+                  <td className="p-2 border text-center font-bold text-blue-900">{r.Reason}</td>
+                  <td className="p-2 border text-center font-bold text-blue-900">{r.Remark}</td>
+                  <td className="p-2 border text-center font-bold text-blue-900">{r.MouldName}</td>
+                  <td className="p-2 border text-center font-bold text-blue-900">{r.StartTime}</td>
+                  <td className="p-2 border text-center font-bold text-blue-900">{r.EndTime}</td>
+                  <td className="p-2 border text-center font-bold text-blue-900">{r.Duration}</td>
                 </tr>
               ))}
             </tbody>
