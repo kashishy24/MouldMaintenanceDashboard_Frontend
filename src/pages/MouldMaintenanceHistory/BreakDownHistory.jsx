@@ -279,6 +279,7 @@ const BreakDownHistory = () => {
   return (
     <DashboardLayout>
       <div className="p-4 w-full">
+          <h2 className="text-center text-3xl font-bold mb-6 text-gray-900 tracking-wide"> Breakdown History</h2>
         {/* ---------------------- FILTER BAR ---------------------- */}
         <div className="flex flex-wrap items-center justify-between bg-white p-4 rounded-xl shadow mb-6">
           <div className="flex gap-3 flex-wrap">
@@ -311,6 +312,7 @@ const BreakDownHistory = () => {
         <div className="grid grid-cols-1 gap-5 mt-10">
           {/* Duration Chart */}
           <div className="h-80 bg-white rounded-xl shadow-md p-10 ml-10 mb-10">
+             <h3 className="font-semibold text-center mb-2 text-black">Breakdown Duration</h3>
             {loadingChart ? (
               <div className="flex items-center justify-center h-full">Loading chart...</div>
             ) : chartError ? (
@@ -342,6 +344,7 @@ const BreakDownHistory = () => {
 
           {/* Occurrence Chart */}
           <div className="h-90 bg-white rounded-xl shadow-md p-8 ml-10 mb-10">
+            <h3 className="font-semibold text-center mb-2 text-black">Breakdown Occurrence</h3>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -379,11 +382,11 @@ const BreakDownHistory = () => {
 
                 {item.mould ? (
                   <div className="mt-2">
-                    <p className="text-2xl font-bold">{item.mould}</p>
+                    <p className="text-2xl font-bold text-black">{item.mould}</p>
                     <p className="text-xl font-semibold text-blue-700">{item.duration}</p>
                   </div>
                 ) : (
-                  <p className="text-3xl font-bold mt-2">{item.value}</p>
+                  <p className="text-3xl font-bold mt-2 text-black">{item.value}</p>
                 )}
               </div>
             ))
@@ -392,7 +395,7 @@ const BreakDownHistory = () => {
 
         {/* ---------------------- TOP 10 BAR (Now API-driven) ---------------------- */}
         <div className="bg-white shadow-md rounded-md p-2 mb-4">
-          <h3 className="font-semibold mb-2 text-center">Top 10 Breakdown By Duration</h3>
+          <h3 className="font-semibold mb-2 text-center text-black">Top 10 Breakdown By Duration</h3>
 
           {loadingTop10 ? (
             <div className="p-6 text-center">Loading top reasons...</div>
@@ -418,7 +421,7 @@ const BreakDownHistory = () => {
 
         {/* ---------------------- TABLE ---------------------- */}
         <div className="bg-white p-4 rounded-xl shadow-md mb-10">
-          <h3 className="text-2xl font-bold mb-4 text-gray-900">Breakdown Details Table</h3>
+          <h3 className="text-2xl font-bold mb-4 text-gray-900 text-center">Breakdown Details Table</h3>
 
           {loadingTable ? (
             <div className="p-6 flex items-center justify-center">Loading table...</div>
@@ -442,13 +445,13 @@ const BreakDownHistory = () => {
                   <tbody>
                     {tableData.map((r, index) => (
                       <tr key={index} className="hover:bg-gray-100">
-                        <td className="p-2 border text-center font-bold text-gray-900">{r.BreakDownID}</td>
-                        <td className="p-2 border text-center font-bold text-gray-900">{r.Reason}</td>
-                        <td className="p-2 border text-center font-bold text-gray-900">{r.Remark}</td>
-                        <td className="p-2 border text-center font-bold text-gray-900">{r.MouldName}</td>
-                        <td className="p-2 border text-center font-bold text-gray-900">{r.StartTime}</td>
-                        <td className="p-2 border text-center font-bold text-gray-900">{r.EndTime}</td>
-                        <td className="p-2 border text-center font-bold text-gray-900">{r.Duration}</td>
+                        <td className="p-2 border text-center font-bold text-blue-900">{r.BreakDownID}</td>
+                        <td className="p-2 border text-center font-bold text-blue-900">{r.Reason}</td>
+                        <td className="p-2 border text-center font-bold text-blue-900">{r.Remark}</td>
+                        <td className="p-2 border text-center font-bold text-blue-900">{r.MouldName}</td>
+                        <td className="p-2 border text-center font-bold text-blue-900">{r.StartTime}</td>
+                        <td className="p-2 border text-center font-bold text-blue-900">{r.EndTime}</td>
+                        <td className="p-2 border text-center font-bold text-blue-900">{r.Duration}</td>
                       </tr>
                     ))}
                     {tableData.length === 0 && (

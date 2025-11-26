@@ -89,11 +89,11 @@ const MouldSummary = () => {
 
       <select
         className="w-full border border-gray-300 px-4 py-3 rounded-lg shadow-sm 
-                   focus:ring-2 focus:ring-blue-400 focus:outline-none bg-gray-50"
+                   focus:ring-2 focus:ring-blue-400 focus:outline-none bg-gray-50 text-black"
         value={selectedMould}
         onChange={(e) => setSelectedMould(e.target.value)}
       >
-        <option value="">-- Select Mould --</option>
+        <option value="" >-- Select Mould --</option>
         {mouldList.map((m, i) => (
           <option key={i} value={m.MouldID}>
             {m.MouldName} ({m.MouldID})
@@ -160,7 +160,7 @@ const MouldSummary = () => {
 
   {/* PM Duration Card */}
   <div className="bg-white rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100">
-    <h2 className="text-xl font-semibold mb-4 text-gray-800">
+    <h2 className="text-xl font-semibold mb-4 text-black text-center">
       PM Duration
     </h2>
 
@@ -170,12 +170,12 @@ const MouldSummary = () => {
           <CartesianGrid strokeDasharray="4 4" stroke="#e5e7eb" />
           <XAxis
             dataKey="date"
-            tick={{ fill: "#6b7280", fontSize: 12 }}
-            label={{ value: "Date of PM", position: "insideBottom", dy: 12 }}
+            tick={{ fill: "#181818ff", fontSize: 12 ,fontWeight: "bold"}}
+            label={{  fill: "#181818ff", fontSize: 12 ,value: "Date of PM", position: "insideBottom", dy: 12 }}
           />
           <YAxis
-            tick={{ fill: "#6b7280", fontSize: 12 }}
-            label={{ value: "Duration", angle: -90, dx: -12 }}
+            tick={{ fill: "#050505ff", fontSize: 12 ,fontWeight: "bold" }}
+            label={{ fill: "#181818ff", fontSize: 12 , value: "Duration", angle: -90, dx: -12 }}
           />
           <Tooltip cursor={{ fill: "rgba(0,0,0,0.05)" }} />
 
@@ -194,7 +194,7 @@ const MouldSummary = () => {
 
   {/* HC Duration Card */}
   <div className="bg-white rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100">
-    <h2 className="text-xl font-semibold mb-4 text-gray-800">
+    <h2 className="text-xl font-semibold mb-4 text-black text-center">
       HC Duration
     </h2>
 
@@ -204,12 +204,12 @@ const MouldSummary = () => {
           <CartesianGrid strokeDasharray="4 4" stroke="#e5e7eb" />
           <XAxis
             dataKey="date"
-            tick={{ fill: "#6b7280", fontSize: 12 }}
-            label={{ value: "Date of HC", position: "insideBottom", dy: 12 }}
+            tick={{ fill: "#181818ff", fontSize: 12 ,fontWeight: "bold" }}
+            label={{ fill: "#181818ff", fontSize: 12, value: "Date of HC", position: "insideBottom", dy: 12 }}
           />
           <YAxis
-            tick={{ fill: "#6b7280", fontSize: 12 }}
-            label={{ value: "Duration", angle: -90, dx: -12 }}
+            tick={{ fill: "#181818ff", fontSize: 12 ,fontWeight: "bold"}}
+            label={{  fill: "#181818ff", fontSize: 12 , value: "Duration", angle: -90, dx: -12 }}
           />
           <Tooltip cursor={{ fill: "rgba(0,0,0,0.05)" }} />
 
@@ -233,7 +233,7 @@ const MouldSummary = () => {
 
   {/* Breakdown by Duration */}
   <div className="bg-white shadow-lg rounded-xl p-4">
-    <h2 className="font-semibold mb-2 text-lg">Top 5 Breakdown by Duration</h2>
+    <h2 className="font-semibold mb-2 text-lg text-black text-center">Top 5 Breakdown by Duration</h2>
     <ResponsiveContainer width="100%" height={260}>
       <BarChart data={topBreakdownDuration} margin={{ bottom: 20 }}>
         <CartesianGrid strokeDasharray="3 3" />
@@ -243,9 +243,9 @@ const MouldSummary = () => {
           textAnchor="end"
           interval={0}
           height={60}
-          tick={{ fontSize: 12 }}
+          tick={{ fontSize: 12 , fill:"#181818ff" ,fontWeight: "bold"}}
         />
-        <YAxis />
+        <YAxis  tick={{ fontSize: 12 ,fill:"#181818ff" ,fontWeight: "bold" }}/>
         <Tooltip />
         <Bar dataKey="duration" fill="#5885E0" />
       </BarChart>
@@ -254,7 +254,7 @@ const MouldSummary = () => {
 
   {/* Breakdown by Count */}
   <div className="bg-white shadow-lg rounded-xl p-4">
-    <h2 className="font-semibold mb-2 text-lg">Top 5 Breakdown by Occurrence</h2>
+    <h2 className="font-semibold mb-2 text-lg text-black text-center">Top 5 Breakdown by Occurrence</h2>
     <ResponsiveContainer width="100%" height={260}>
       <BarChart data={topBreakdownCount} margin={{ bottom: 20 }}>
         <CartesianGrid strokeDasharray="3 3" />
@@ -264,9 +264,9 @@ const MouldSummary = () => {
           textAnchor="end"
           interval={0}
           height={60}
-          tick={{ fontSize: 12 }}
+          tick={{ fontSize: 12 ,fill:"#181818ff" , fontWeight: "bold" }}
         />
-        <YAxis />
+        <YAxis  tick={{ fontSize: 12 ,fill:"#181818ff" ,fontWeight: "bold"}}/>
         <Tooltip />
         <Bar dataKey="count" fill="#FF8C42" />
       </BarChart>
@@ -277,7 +277,7 @@ const MouldSummary = () => {
 
         {/* Spare Part Consumption */}
 <div className="bg-white rounded-2xl p-5 mt-10 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100">
-  <h2 className="text-xl font-semibold mb-4 text-gray-800">
+  <h2 className="text-xl font-semibold mb-4 text-black text-center">
     Top 10 Spare Part Consumption
   </h2>
 
@@ -288,13 +288,13 @@ const MouldSummary = () => {
         
         <XAxis
           dataKey="name"
-          tick={{ fill: "#6b7280", fontSize: 12 }}
+          tick={{  fill: "#181818ff", fontSize: 12 ,fontWeight: "bold"}}
           angle={-8}
           textAnchor="end"
           interval={0}
         />
 
-        <YAxis tick={{ fill: "#6b7280", fontSize: 12 }} />
+        <YAxis tick={{ fill: "#181818ff", fontSize: 12 ,fontWeight: "bold"}} />
 
         <Tooltip cursor={{ fill: "rgba(0,0,0,0.05)" }} />
 

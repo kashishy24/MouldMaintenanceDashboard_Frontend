@@ -31,6 +31,26 @@ export default function SparePartUI() {
       { date: "2025-11-10", shift: "C", category: "Common", spare: "Coil Heater", mould: "M-B1", quantity: 22, stock: 55 },
       { date: "2025-11-11", category: "Common", spare: "Coil Heater", mould: "M-B1", quantity: 14, stock: 41 },
       { date: "2025-11-12", category: "Common", spare: "Heater", mould: "M-B2", quantity: 6, stock: 60 },
+        { date: "2025-11-13", category: "Common", spare: "Coil Heater", mould: "M-B1", quantity: 14, stock: 41 },
+      { date: "2025-11-14", category: "Common", spare: "Heater", mould: "M-B2", quantity: 6, stock: 60 },
+        { date: "2025-11-15", category: "Common", spare: "Coil Heater", mould: "M-B1", quantity: 14, stock: 41 },
+      { date: "2025-11-16", category: "Common", spare: "Heater", mould: "M-B2", quantity: 6, stock: 60 },
+        { date: "2025-11-17", category: "Common", spare: "Coil Heater", mould: "M-B1", quantity: 14, stock: 41 },
+      { date: "2025-11-18", category: "Common", spare: "Heater", mould: "M-B2", quantity: 6, stock: 60 },
+
+        { date: "2025-11-19", category: "Common", spare: "Coil Heater", mould: "M-B1", quantity: 14, stock: 41 },
+      { date: "2025-11-20", category: "Common", spare: "Heater", mould: "M-B2", quantity: 6, stock: 60 },
+        { date: "2025-11-21", category: "Common", spare: "Coil Heater", mould: "M-B1", quantity: 14, stock: 41 },
+      { date: "2025-11-12", category: "Common", spare: "Heater", mould: "M-B2", quantity: 6, stock: 60 },
+        { date: "2025-11-11", category: "Common", spare: "Coil Heater", mould: "M-B1", quantity: 14, stock: 41 },
+      { date: "2025-11-12", category: "Common", spare: "Heater", mould: "M-B2", quantity: 6, stock: 60 },
+        { date: "2025-11-11", category: "Common", spare: "Coil Heater", mould: "M-B1", quantity: 14, stock: 41 },
+      { date: "2025-11-12", category: "Common", spare: "Heater", mould: "M-B2", quantity: 6, stock: 60 },
+        { date: "2025-11-11", category: "Common", spare: "Coil Heater", mould: "M-B1", quantity: 14, stock: 41 },
+      { date: "2025-11-12", category: "Common", spare: "Heater", mould: "M-B2", quantity: 6, stock: 60 },
+        { date: "2025-11-11", category: "Common", spare: "Coil Heater", mould: "M-B1", quantity: 14, stock: 41 },
+      { date: "2025-11-12", category: "Common", spare: "Heater", mould: "M-B2", quantity: 6, stock: 60 },
+
       { date: "2025-11-13", category: "Common", spare: "Ejector Rod", mould: "M-C1", quantity: 7, stock: 44 },
       { date: "2025-11-14", category: "Consumable", spare: "Ejector Pin", mould: "M-C1", quantity: 3, stock: 34 },
       { date: "2025-11-15", category: "Common", spare: "Thermo couple", mould: "M-A1", quantity: 21, stock: 57 },
@@ -48,6 +68,58 @@ export default function SparePartUI() {
     ],
     []
   );
+const topBarChart = [
+  { name: "Item 1", value: 12 },
+  { name: "Item 2", value: 18 },
+  { name: "Item 3", value: 9 },
+  { name: "Item 4", value: 22 },
+  { name: "Item 5", value: 15 },
+  { name: "Item 6", value: 27 },
+  { name: "Item 7", value: 14 },
+  { name: "Item 8", value: 30 },
+  { name: "Item 9", value: 8 },
+  { name: "Item 10", value: 25 },
+  { name: "Item 11", value: 19 },
+  { name: "Item 12", value: 16 },
+  { name: "Item 13", value: 21 },
+  { name: "Item 14", value: 11 },
+  { name: "Item 15", value: 7 },
+  { name: "Item 16", value: 13 },
+  { name: "Item 17", value: 28 },
+  { name: "Item 18", value: 10 },
+  { name: "Item 19", value: 17 },
+  { name: "Item 20", value: 26 },
+  { name: "Item 21", value: 29 },
+  { name: "Item 22", value: 24 },
+  { name: "Item 23", value: 6 },
+  { name: "Item 24", value: 20 },
+  { name: "Item 25", value: 12 },
+  { name: "Item 26", value: 23 },
+  { name: "Item 27", value: 14 },
+  { name: "Item 28", value: 9 },
+  { name: "Item 29", value: 18 },
+  { name: "Item 30", value: 27 },
+  { name: "Item 31", value: 16 },
+  { name: "Item 32", value: 22 },
+  { name: "Item 33", value: 5 },
+  { name: "Item 34", value: 11 },
+  { name: "Item 35", value: 8 },
+  { name: "Item 36", value: 15 },
+  { name: "Item 37", value: 19 },
+  { name: "Item 38", value: 13 },
+  { name: "Item 39", value: 28 },
+  { name: "Item 40", value: 17 },
+  { name: "Item 41", value: 21 },
+  { name: "Item 42", value: 10 },
+  { name: "Item 43", value: 24 },
+  { name: "Item 44", value: 26 },
+  { name: "Item 45", value: 7 },
+  { name: "Item 46", value: 23 },
+  { name: "Item 47", value: 29 },
+  { name: "Item 48", value: 6 },
+  { name: "Item 49", value: 30 },
+  { name: "Item 50", value: 12 },
+];
 
   // -------------------------
   // Table aggregated stocks (latest record per spare)
@@ -199,7 +271,7 @@ export default function SparePartUI() {
   }, [category, spareName, mouldName, filterLowStock, sortAlpha, rangeStart, rangeEnd]);
 
   // chart-ready data
-  const topBarChart = topParts.map((d) => ({ name: d.name, value: d.value }));
+  // const topBarChart = topParts.map((d) => ({ name: d.name, value: d.value }));
   const trendChart = trend.map((d) => ({ name: d.label, value: d.value }));
 
   // small helpers for visual parity with image
@@ -213,7 +285,7 @@ export default function SparePartUI() {
         <div className="flex flex-wrap items-center justify-between bg-white p-4 rounded-xl shadow mb-6">
           <div className="flex gap-3 flex-wrap">
             <button className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow" onClick={() => navigate("/MouldMaintenanceHistory")}>
-              HC
+              PM
             </button>
             <button className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow" onClick={() => navigate("/HCHistory")}>
               HC
@@ -259,47 +331,109 @@ export default function SparePartUI() {
 
         {/* Category dropdown */}
         <div className="flex items-center justify-between mb-4 gap-4">
-          <div className="flex items-center gap-3">
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className="border px-3 py-2 rounded w-48">
-              {categories.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </div>
-        </div>
+  <div className="flex items-center gap-3 
+                  px-5 py-3 rounded-2xl shadow-lg 
+                  backdrop-blur-md bg-white/40 border border-white/30">
+
+    <label className="font-semibold text-gray-800">Category</label>
+
+    <select
+      value={category}
+      onChange={(e) => setCategory(e.target.value)}
+      className="px-4 py-2 rounded-xl bg-white/70 text-gray-800 
+                 focus:ring-2 focus:ring-blue-500 focus:outline-none 
+                 font-medium w-60 shadow-sm"
+    >
+      {categories.map((c) => (
+        <option key={c} value={c}>{c}</option>
+      ))}
+    </select>
+
+  </div>
+</div>
+
 
         {/* Top line chart */}
         <div className="bg-white rounded-xl shadow p-4 mb-6">
-          <h3 className="text-center font-semibold text-gray-700 mb-2">{topTitle}</h3>
-          <div style={{ height: 140 }}>
+          <h3 className="text-center font-semibold text-black mb-2">{topTitle}</h3>
+          <div style={{ height: 300 }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={trendChart.length ? trendChart : [{ name: "No data", value: 0 }]}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
+                <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#000000ff", fontWeight: "bold" }}label={{  fill: "#181818ff", fontSize: 12 ,value: "Date ", position: "insideBottom", dy: 10}}/>
+                <YAxis tick={{ fontSize: 12, fill: "#000000ff", fontWeight: "bold" }}label={{ fill: "#181818ff", fontSize: 12 , value: "Count", angle: -90, dx: -12 }}/>
                 <Tooltip />
-                <Legend />
+                {/* <Legend /> */}
                 <Line type="monotone" dataKey="value" stroke="#1E3A8A" />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Middle: horizontal bar (Top 50) */}
-        <div className="bg-white rounded-xl shadow p-4 mb-6">
-          <h4 className="text-center font-semibold text-gray-700 mb-2">{midTitle}</h4>
-          <div style={{ height: 220 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={topBarChart} layout="vertical" margin={{ left: 20, right: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis dataKey="name" type="category" width={160} />
-                <Tooltip />
-                <Bar dataKey="value" name="Quantity" fill="#1E3A8A" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+       {/* Middle: horizontal bar (Top 50) */}
+{/* Middle: horizontal bar (Top 50) */}
+<div className="bg-white rounded-xl shadow p-6 mb-6">
+  <h4 className="text-center font-semibold text-gray-800 text-lg mb-4">
+    {midTitle}
+  </h4>
 
-        <div className="flex items-center gap-3 mb-3">
+  {/* Scrollable container for 50 rows */}
+  <div style={{ height: 600, overflowY: "auto", paddingRight: 10 }}>
+    <ResponsiveContainer width="100%" height={1600}>
+      <BarChart
+        data={topBarChart}
+        layout="vertical"
+        barCategoryGap={2}       // spacing between bars
+        margin={{ top: 20, right: 40, left: 80, bottom: 20 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" opacity={0.4} />
+
+        <XAxis
+          type="number"
+          tick={{ fontSize: 12, fill: "#000", fontWeight: "600" }}
+          label={{
+            value: "Count",
+            position: "insideBottom",
+            dy: 10,
+            fill: "#333",
+            fontWeight: "600",
+          }}
+        />
+
+        <YAxis
+          dataKey="name"
+          type="category"
+          width={100}
+          tick={{ fontSize: 12, fill: "#000", fontWeight: "600" }}
+          interval={0} // show all 50 labels cleanly
+          label={{
+            value: "Name",
+            angle: -90,
+            dx: -60,
+            fill: "#333",
+            fontWeight: "600",
+          }}
+        />
+
+        <Tooltip
+          wrapperStyle={{ fontSize: 14, borderRadius: 8 }}
+          contentStyle={{ borderRadius: 8 }}
+        />
+
+        <Bar
+          dataKey="value"
+          name="Quantity"
+          fill="#1E3A8A"
+          barSize={12}        // thicker bar
+          radius={[6, 6, 6, 6]} // rounded bar edges
+        />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+</div>
+
+
+        {/* <div className="flex items-center gap-3 mb-3">
           <select value={spareName} onChange={(e) => setSpareName(e.target.value)} className="border px-3 py-2 rounded w-56">
             <option value="">Spare Part Name</option>
             {spareNames.map((s) => <option key={s} value={s}>{s}</option>)}
@@ -308,10 +442,10 @@ export default function SparePartUI() {
             <option value="">Mould Name</option>
             {mouldNames.map((m) => <option key={m} value={m}>{m}</option>)}
           </select>
-        </div>
+        </div> */}
 
         {/* Spare part trend small chart */}
-        <div className="bg-white rounded-xl shadow p-4 mb-6">
+        {/* <div className="bg-white rounded-xl shadow p-4 mb-6">
           <h4 className="text-center font-semibold text-gray-700 mb-2">{spareName || "YHB RPG Extension"}</h4>
           <div style={{ height: 120 }}>
             <ResponsiveContainer width="100%" height="100%">
@@ -324,29 +458,29 @@ export default function SparePartUI() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </div> */}
 
         {/* Filters above table */}
         <div className="flex items-center gap-3 mb-3">
           {/* <select className="border px-3 py-2 rounded w-56">
             <option>Category</option>
           </select> */}
-          <div className="ml-auto flex items-center gap-3">
+          {/* <div className="ml-auto flex items-center gap-3">
             <label className="text-sm">
               <input type="checkbox" checked={sortAlpha} onChange={(e) => setSortAlpha(e.target.checked)} /> Sort A-Z
             </label>
             <label className="text-sm">
               <input type="checkbox" checked={filterLowStock} onChange={(e) => setFilterLowStock(e.target.checked)} /> Low stock only
             </label>
-          </div>
+          </div> */}
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-xl shadow p-4">
+        {/* <div className="bg-white rounded-xl shadow p-4">
           <table className="w-full border-collapse text-sm">
             <thead className="bg-blue-900 text-white text-xs">
               <tr>
-                <th className="p-2 border">Spare Part Name</th>
+                <th className="p-2 border ">Spare Part Name</th>
                 <th className="p-2 border">Spare Part Category</th>
                 <th className="p-2 border">Spare Part Status</th>
                 <th className="p-2 border">Spare Part Stock Quantity</th>
@@ -359,19 +493,19 @@ export default function SparePartUI() {
             <tbody>
               {tableData.map((r) => (
                 <tr key={r.id} className={`text-center ${r.stock <= r.reorderLevel ? "bg-red-50" : ""}`}>
-                  <td className="p-2 border text-left">{r.name}</td>
-                  <td className="p-2 border">{r.category}</td>
-                  <td className="p-2 border">{r.stock > r.reorderLevel ? "OK" : "Low"}</td>
-                  <td className="p-2 border">{r.stock}</td>
-                  <td className="p-2 border">{r.location}</td>
-                  <td className="p-2 border">{r.minQty}</td>
-                  <td className="p-2 border">{r.maxQty}</td>
-                  <td className="p-2 border">{r.reorderLevel}</td>
+                  <td className="p-2 border text-left text-center font-bold text-blue-900">{r.name}</td>
+                  <td className="p-2 border text-center font-bold text-blue-900">{r.category}</td>
+                  <td className="p-2 border text-center font-bold text-blue-900">{r.stock > r.reorderLevel ? "OK" : "Low"}</td>
+                  <td className="p-2 border text-center font-bold text-blue-900">{r.stock}</td>
+                  <td className="p-2 border text-center font-bold text-blue-900">{r.location}</td>
+                  <td className="p-2 border text-center font-bold text-blue-900">{r.minQty}</td>
+                  <td className="p-2 border text-center font-bold text-blue-900">{r.maxQty}</td>
+                  <td className="p-2 border text-center font-bold text-blue-900">{r.reorderLevel}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
+        </div> */}
       </div>
     </DashboardLayout>
   );

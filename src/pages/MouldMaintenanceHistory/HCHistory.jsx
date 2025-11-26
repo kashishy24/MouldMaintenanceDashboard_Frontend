@@ -43,7 +43,7 @@ const HCHistory = () => {
   const [tableError, setTableError] = useState(null);
 
   // BASE for API — uses Vite env or fallback to the host you shared
-  const BASE = (import.meta.env.VITE_BACKEND_BASE_URL || "http://192.168.1.10:3004/api").replace(/\/+$/, "");
+  const BASE = (import.meta.env.VITE_BACKEND_BASE_URL || "http://192.168.1.16:3004/api").replace(/\/+$/, "");
   const HC_CHART_ENDPOINT = `${BASE}/MouldMaintenanceHistoryhc/hcPlannedVsActualCustom`;
   const HC_TIME_ENDPOINT = `${BASE}/MouldMaintenanceHistoryhc/hcTimeDetails`;
   const HC_DELAY_ENDPOINT = `${BASE}/MouldMaintenanceHistoryhc/hcDelayOnTime`;
@@ -256,11 +256,12 @@ const HCHistory = () => {
   return (
     <DashboardLayout>
       <div className="p-6 w-full text-gray-800">
+           <h2 className="text-center text-3xl font-bold mb-6 text-gray-900 tracking-wide"> Health Check History</h2>
         {/* TOP SECTION */}
         <div className="flex flex-wrap items-center justify-between bg-white p-4 rounded-xl shadow mb-6">
           {/* BUTTONS */}
           <div className="flex gap-3 flex-wrap">
-            <button className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow" onClick={() => navigate("/MouldMaintenanceHistory")}>HC</button>
+            <button className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow" onClick={() => navigate("/MouldMaintenanceHistory")}>PM</button>
             <button className="px-6 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 shadow" onClick={() => navigate("/HCHistory")}>HC</button>
             <button className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow" onClick={() => navigate("/MouldBreakdownHistory")}>Breakdown</button>
             <button className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow" onClick={() => navigate("/SparePartHistory")}>Spare Part</button>
@@ -282,11 +283,9 @@ const HCHistory = () => {
           </div>
         </div>
 
-        {/* TITLE */}
-        <h2 className="text-center text-3xl font-bold mb-6 text-gray-900 tracking-wide">Mould Health check Maintenance</h2>
-
         {/* CHART */}
-        <div className="w-full h-80 bg-white rounded-xl shadow-md p-5 mb-10">
+        <div className="w-full h-80 bg-white rounded-xl shadow-md p-8 mb-10">
+          <h3 className="font-semibold text-center mb-2 text-black">PM Plan Vs Actual</h3>
           {loadingChart ? (
             <div className="flex items-center justify-center h-full">Loading chart...</div>
           ) : chartError ? (
@@ -324,7 +323,7 @@ const HCHistory = () => {
 
         {/* TABLE SECTION - HC Details */}
         <div className="bg-white rounded-xl shadow p-6">
-          <h3 className="text-2xl font-bold mb-4 text-gray-900">Mould HC Details</h3>
+          <h3 className="text-2xl font-bold mb-4 text-gray-900 text-center">Mould HC Details</h3>
 
           {loadingTable ? (
             <div className="p-6 flex items-center justify-center">Loading HC details...</div>
@@ -358,16 +357,16 @@ const HCHistory = () => {
                     ) : (
                       hcTableData.map((row, index) => (
                         <tr key={row.key ?? index} className="text-center border">
-                          <td className="p-3 border text-left whitespace-nowrap">{row.checkListName}</td>
-                          <td className="p-3 border whitespace-nowrap">{row.instance}</td>
-                          <td className="p-3 border whitespace-nowrap">{row.mouldName}</td>
-                          <td className="p-3 border whitespace-nowrap">{row.materialName}</td>
-                          <td className="p-3 border whitespace-nowrap">{row.userId || "-"}</td>
-                          <td className="p-3 border whitespace-nowrap">{row.hcStatus}</td>
-                          <td className="p-3 border whitespace-nowrap">{row.hcDuration}</td>
-                          <td className="p-3 border whitespace-nowrap">{row.atMouldLife ?? "-"}</td>
-                          <td className="p-3 border whitespace-nowrap">{formatFriendlyDate(row.startTime)}</td>
-                          <td className="p-3 border text-left whitespace-nowrap">{row.remark || "-"}</td>
+                          <td className="p-3 border text-left whitespace-nowrap text-center font-bold text-blue-900">{row.checkListName}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.instance}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.mouldName}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.materialName}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.userId || "-"}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.hcStatus}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.hcDuration}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.atMouldLife ?? "-"}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{formatFriendlyDate(row.startTime)}</td>
+                          <td className="p-3 border text-left whitespace-nowrap text-center font-bold text-blue-900">{row.remark || "-"}</td>
                         </tr>
                       ))
                     )}

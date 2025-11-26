@@ -259,6 +259,8 @@ export default function MouldMaintenanceHistory() {
   return (
     <DashboardLayout>
       <div className="p-6 w-full text-gray-800">
+          {/* TITLE */}
+        <h2 className="text-center text-3xl font-bold mb-6 text-gray-900 tracking-wide"> Preventive Maintenance History</h2>
         {/* TOP FILTER + BUTTONS */}
         <div className="flex flex-wrap items-center justify-between bg-white p-4 rounded-xl shadow mb-6">
           <div className="flex gap-3 flex-wrap">
@@ -287,11 +289,11 @@ export default function MouldMaintenanceHistory() {
           </div>
         </div>
 
-        {/* TITLE */}
-        <h2 className="text-center text-3xl font-bold mb-6 text-gray-900 tracking-wide">Mould Preventive Maintenance</h2>
+      
 
         {/* CHART */}
-        <div className="w-full h-80 bg-white rounded-xl shadow-md p-5 mb-6">
+        <div className="w-full h-80 bg-white rounded-xl shadow-md p-8 mb-6">
+            <h3 className="font-semibold text-center mb-2 text-black">PM Plan Vs Actual</h3>
           {loadingChart ? (
             <div className="flex items-center justify-center h-full">Loading chart...</div>
           ) : chartError ? (
@@ -300,8 +302,8 @@ export default function MouldMaintenanceHistory() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
+                <XAxis dataKey="date" tick={{ fontSize: 12 ,fill: "#000000ff",fontWeight: "bold"}} />
+                <YAxis tick={{ fontSize: 12 ,fill: "#000000ff",fontWeight: "bold"}}/>
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="plan" fill="#1E3A8A" radius={[4, 4, 0, 0]} name="Plan" />
@@ -329,7 +331,7 @@ export default function MouldMaintenanceHistory() {
 
         {/* TABLE SECTION */}
         <div className="bg-white rounded-xl shadow p-6">
-          <h3 className="text-2xl font-bold mb-4 text-gray-900">Mould PM Details</h3>
+          <h3 className="text-2xl font-bold mb-4 text-gray-900 text-center">Mould PM Details</h3>
 
           {loadingTable ? (
             <div className="p-6 flex items-center justify-center">Loading PM details...</div>
@@ -369,17 +371,17 @@ export default function MouldMaintenanceHistory() {
                       </tr>
                     ) : (
                       pmTableData.map((row, index) => (
-                        <tr key={row.key ?? index} className="text-center border">
-                          <td className="p-3 border text-left whitespace-nowrap">{row.checkListName}</td>
-                          <td className="p-3 border whitespace-nowrap">{row.instance}</td>
-                          <td className="p-3 border whitespace-nowrap">{row.mouldName}</td>
-                          <td className="p-3 border whitespace-nowrap">{row.materialName}</td>
-                          <td className="p-3 border whitespace-nowrap">{row.userId}</td>
-                          <td className="p-3 border whitespace-nowrap">{row.pmStatus}</td>
-                          <td className="p-3 border whitespace-nowrap">{row.pmDuration}</td>
-                          <td className="p-3 border whitespace-nowrap">{row.atMouldLife ?? "-"}</td>
-                          <td className="p-3 border whitespace-nowrap">{formatFriendlyDate(row.startTime)}</td>
-                          <td className="p-3 border text-left whitespace-nowrap">{row.remark || "-"}</td>
+                        <tr key={row.key ?? index} className="text-center border ">
+                          <td className="p-3 border text-left whitespace-nowrap text-center font-bold text-blue-900">{row.checkListName}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.instance}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.mouldName}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.materialName}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.userId}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.pmStatus}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.pmDuration}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.atMouldLife ?? "-"}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{formatFriendlyDate(row.startTime)}</td>
+                          <td className="p-3 border text-left whitespace-nowrap text-center font-bold text-blue-900">{row.remark || "-"}</td>
                         </tr>
                       ))
                     )}
