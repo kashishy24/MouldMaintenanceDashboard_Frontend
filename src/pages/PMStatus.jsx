@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import DashboardLayout from "../partials/DashboardLayout";
 import {
   BarChart,
@@ -10,18 +10,24 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import axios from "axios";
 
-const warningAlarmAlertData = [
-  { mould: "M01", Status: 2, NextPMDueDate: "2025-12-10", NextPMShotCount: 25000 },
-  { mould: "M02", Status: 3, NextPMDueDate: "2025-12-12", NextPMShotCount: 35000 },
-  { mould: "M03", Status: 3, NextPMDueDate: "2025-12-12", NextPMShotCount: 35000 },
-  { mould: "M04", Status: 2, NextPMDueDate: "2025-12-10", NextPMShotCount: 25000 },
-  { mould: "M05", Status: 3, NextPMDueDate: "2025-12-12", NextPMShotCount: 35000 },
-  { mould: "M06", Status: 3, NextPMDueDate: "2025-12-12", NextPMShotCount: 35000 },
-  { mould: "M07", Status: 2, NextPMDueDate: "2025-12-10", NextPMShotCount: 25000 },
-  { mould: "M08", Status: 3, NextPMDueDate: "2025-12-12", NextPMShotCount: 35000 },
-  { mould: "M09", Status: 3, NextPMDueDate: "2025-12-12", NextPMShotCount: 35000 },
-];
+// 🔹 API base + endpoint
+const BASE = (
+  import.meta.env.VITE_BACKEND_BASE_URL || "http://192.168.1.14:3004/api"
+).replace(/\/+$/, "");
+const PM_STATUS_ENDPOINT = `${BASE}/PMStatus/MouldPMStatus`;
+
+// 🔹 Helper to format date
+const formatDate = (iso) => {
+  if (!iso) return "-";
+  try {
+    const d = new Date(iso);
+    return d.toISOString().slice(0, 10); // YYYY-MM-DD
+  } catch {
+    return iso;
+  }
+};
 
 const weekWisePMPlan = [
   { week: "Week 1", plan: 8 },
@@ -52,9 +58,9 @@ const pmInPlanData = [
 ];
 
 const pmByData = [
-  { mould: "M01", NextPMDate: '2026-01-04' },
-  { mould: "M03",  NextPMDate: '2026-01-04' },
-  { mould: "M02", NextPMDate: '2026-01-04' },
+  { mould: "M01", NextPMDate: "2026-01-04" },
+  { mould: "M03", NextPMDate: "2026-01-04" },
+  { mould: "M02", NextPMDate: "2026-01-04" },
 ];
 
 const nextSixMonthData = [
@@ -73,17 +79,51 @@ const pmByShotCountData = [
 ];
 
 const PMStatus = () => {
+  // 🔹 State for first table (API data)
+  const [pmStatusRows, setPmStatusRows] = useState([]);
+  const [loadingPM, setLoadingPM] = useState(false);
+  const [pmError, setPmError] = useState(null);
+
+  useEffect(() => {
+    const fetchPMStatus = async () => {
+      setLoadingPM(true);
+      setPmError(null);
+      try {
+        const res = await axios.get(PM_STATUS_ENDPOINT);
+        const rows = res?.data?.data ?? [];
+
+        // Map backend fields -> table fields
+        const mapped = rows.map((r) => ({
+          mould: r.MouldName || r.MouldID, // show name, fallback to ID
+          status: r.MouldPMStatus ?? "-",
+          nextPMDueDate: formatDate(r.NextPMDueDate),
+          shotCount: r.NextPMDue ?? "-", // using NextPMDue as shot count
+        }));
+
+        setPmStatusRows(mapped);
+      } catch (err) {
+        console.error("Failed to load Mould PM Status:", err);
+        setPmError("Failed to load PM Warning / Alarm / Alert status.");
+      } finally {
+        setLoadingPM(false);
+      }
+    };
+
+    fetchPMStatus();
+  }, []);
+
   return (
     <DashboardLayout>
       <div className="p-4">
-
         {/* 1️⃣ Warning / Alarm / Alert */}
         <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
           Table which will show the PM Warning / Alarm / Alert status
         </div>
 
-        <div className="bg-white shadow-md p-4 rounded-lg mb-6"
-             style={{ maxHeight: "250px", overflowY: "auto" }}>
+        <div
+          className="bg-white shadow-md p-4 rounded-lg mb-6"
+          style={{ maxHeight: "250px", overflowY: "auto" }}
+        >
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
@@ -94,14 +134,34 @@ const PMStatus = () => {
               </tr>
             </thead>
             <tbody>
-              {warningAlarmAlertData.map((row, i) => (
-                <tr key={i}>
-                  <td className="border p-2">{row.mould}</td>
-                  <td className="border p-2">{row.Status}</td>
-                  <td className="border p-2">{row.NextPMDueDate}</td>
-                  <td className="border p-2">{row.NextPMShotCount}</td>
+              {loadingPM ? (
+                <tr>
+                  <td colSpan={4} className="border p-2 text-center">
+                    Loading...
+                  </td>
                 </tr>
-              ))}
+              ) : pmError ? (
+                <tr>
+                  <td colSpan={4} className="border p-2 text-center text-red-600">
+                    {pmError}
+                  </td>
+                </tr>
+              ) : pmStatusRows.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="border p-2 text-center">
+                    No data available.
+                  </td>
+                </tr>
+              ) : (
+                pmStatusRows.map((row, i) => (
+                  <tr key={i}>
+                    <td className="border p-2">{row.mould}</td>
+                    <td className="border p-2">{row.status}</td>
+                    <td className="border p-2">{row.nextPMDueDate}</td>
+                    <td className="border p-2">{row.shotCount}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -110,7 +170,10 @@ const PMStatus = () => {
         <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
           Week wise PM Plan Histogram
         </div>
-        <div className="bg-white shadow-md p-4 rounded-lg mb-6" style={{ height: 300 }}>
+        <div
+          className="bg-white shadow-md p-4 rounded-lg mb-6"
+          style={{ height: 300 }}
+        >
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={weekWisePMPlan}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -127,8 +190,10 @@ const PMStatus = () => {
         <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
           Table which will show the PM in Plan
         </div>
-        <div className="bg-white shadow-md p-4 rounded-lg mb-6"
-             style={{ maxHeight: "250px", overflowY: "auto" }}>
+        <div
+          className="bg-white shadow-md p-4 rounded-lg mb-6"
+          style={{ maxHeight: "250px", overflowY: "auto" }}
+        >
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
@@ -149,10 +214,12 @@ const PMStatus = () => {
 
         {/* 4️⃣ Duration Table ASC */}
         <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
-          Table which will show the PM by Duration 
+          Table which will show the PM by Duration
         </div>
-        <div className="bg-white shadow-md p-4 rounded-lg mb-6"
-             style={{ maxHeight: "250px", overflowY: "auto" }}>
+        <div
+          className="bg-white shadow-md p-4 rounded-lg mb-6"
+          style={{ maxHeight: "250px", overflowY: "auto" }}
+        >
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
@@ -162,7 +229,10 @@ const PMStatus = () => {
             </thead>
             <tbody>
               {pmByData
-                .sort((a, b) => a.NextPMDate - b.NextPMDate)
+                .sort(
+                  (a, b) =>
+                    new Date(a.NextPMDate) - new Date(b.NextPMDate)
+                )
                 .map((row, i) => (
                   <tr key={i}>
                     <td className="border p-2">{row.mould}</td>
@@ -177,7 +247,10 @@ const PMStatus = () => {
         <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
           Chart for showing next 6 months how many mould will come in PM
         </div>
-        <div className="bg-white shadow-md p-4 rounded-lg mb-6" style={{ height: 300 }}>
+        <div
+          className="bg-white shadow-md p-4 rounded-lg mb-6"
+          style={{ height: 300 }}
+        >
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={nextSixMonthData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -192,10 +265,12 @@ const PMStatus = () => {
 
         {/* 6️⃣ Shot Count ASC */}
         <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
-          Table which will show the PM by Shot Count 
+          Table which will show the PM by Shot Count
         </div>
-        <div className="bg-white shadow-md p-4 rounded-lg mb-6"
-             style={{ maxHeight: "250px", overflowY: "auto" }}>
+        <div
+          className="bg-white shadow-md p-4 rounded-lg mb-6"
+          style={{ maxHeight: "250px", overflowY: "auto" }}
+        >
           <table className="w-full border">
             <thead>
               <tr className="bg-gray-100">
@@ -215,7 +290,6 @@ const PMStatus = () => {
             </tbody>
           </table>
         </div>
-
       </div>
     </DashboardLayout>
   );
