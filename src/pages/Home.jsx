@@ -64,6 +64,13 @@ export default function Home() {
   const [pmError, setPmError] = useState(null);
   // PM Table
   const [pmTableApi, setPmTableApi] = useState([]);
+
+  //HC Chart Data State
+
+  const [hcChartData, setHcChartData] = useState([]);
+  const [hcLoading, setHcLoading] = useState(false);
+  const [hcError, setHcError] = useState(null);
+
   // HC Table
   const [hcTableApi, setHcTableApi] = useState([]);
   // breakdown
@@ -78,6 +85,9 @@ export default function Home() {
   // PM / HC / breakdown endpoints you've been using
   const API_BASE = `${BASE}/Home/mouldPMPlannedVsActual`;
   const PM_API = `${BASE}/Home/mouldPMStatus`;
+  // HC PLANNED vs ACTUAL chart API
+  const HC_PLAN_ACTUAL_API = `${BASE}/Home/mouldHCPlannedVsActual`;
+
   const HC_API = `${BASE}/Home/mouldHCStatus`; // fixed typo
   const BREAKDOWN_API = `${BASE}/Home/Top5BreakdownByDuration`;
   const BREAKDOWN_API_OCC = `${BASE}/Home/Top5BreakdownByOccurrences`;
@@ -161,6 +171,54 @@ export default function Home() {
     };
     fetchPMData();
   }, [filter, rangeStart, rangeEnd, PM_API]);
+
+  // ---------------- FETCH HC CHART --------------------
+  useEffect(() => {
+    const fetchHCChart = async () => {
+      const typeNum = filterTypeNumber(filter);
+      if (typeNum === 5 && (!rangeStart || !rangeEnd)) return;
+
+      setHcLoading(true);
+      setHcError(null);
+
+      try {
+        let url = `${HC_PLAN_ACTUAL_API}?filterType=${typeNum}`;
+        if (typeNum === 5)
+          url += `&startDate=${rangeStart}&endDate=${rangeEnd}`;
+
+        const res = await axios.get(url);
+        const rows = res?.data?.data ?? res?.data ?? [];
+
+        const formatted = (Array.isArray(rows) ? rows : []).map((r) => {
+          const shift = r.OutputLabel ?? r.ShiftName ?? "";
+          const workDate = r.WorkDateOutput ?? r.PlanDate ?? r.WorkDate ?? "";
+          const planned = r.PlannedCount ?? r.Planned ?? 0;
+          const actual = r.ActualCount ?? r.Actual ?? 0;
+
+          let label = workDate;
+          if (["shift", "day", "week"].includes(filter)) {
+            label = `${shift} (${workDate})`;
+          }
+
+          return {
+            date: label,
+            plan: Number(planned),
+            actual: Number(actual),
+          };
+        });
+
+        setHcChartData(formatted);
+      } catch (err) {
+        console.error("HC Chart API Error:", err);
+        setHcError("Failed to load HC Plan vs Actual");
+        setHcChartData([]);
+      } finally {
+        setHcLoading(false);
+      }
+    };
+
+    fetchHCChart();
+  }, [filter, rangeStart, rangeEnd, HC_PLAN_ACTUAL_API]);
 
   // ---------------- FETCH HC TABLE --------------------
   useEffect(() => {
@@ -295,13 +353,13 @@ export default function Home() {
         <div className="max-w-9xl mx-auto">
           {/* ---- FILTERS ---- */}
           <div className="flex flex-wrap items-center justify-between bg-white p-4 rounded-xl shadow mb-6">
-              <div className="flex gap-3 flex-wrap">
-                <PillButton  active={filter === "shift"} onClick={() => { setFilter("shift"); setRangeStart(""); setRangeEnd(""); }}>Shift</PillButton>
-            <PillButton active={filter === "day"} onClick={() => { setFilter("day"); setRangeStart(""); setRangeEnd(""); }}>Day</PillButton>
-            <PillButton active={filter === "week"} onClick={() => { setFilter("week"); setRangeStart(""); setRangeEnd(""); }}>Week</PillButton>
-            <PillButton active={filter === "month"} onClick={() => { setFilter("month"); setRangeStart(""); setRangeEnd(""); }}>Month</PillButton>
-              </div>
-            
+            <div className="flex gap-3 flex-wrap">
+              <PillButton active={filter === "shift"} onClick={() => { setFilter("shift"); setRangeStart(""); setRangeEnd(""); }}>Shift</PillButton>
+              <PillButton active={filter === "day"} onClick={() => { setFilter("day"); setRangeStart(""); setRangeEnd(""); }}>Day</PillButton>
+              <PillButton active={filter === "week"} onClick={() => { setFilter("week"); setRangeStart(""); setRangeEnd(""); }}>Week</PillButton>
+              <PillButton active={filter === "month"} onClick={() => { setFilter("month"); setRangeStart(""); setRangeEnd(""); }}>Month</PillButton>
+            </div>
+
 
             <div className="ml-6 flex items-center">
               <span className="mr-2">Start Date</span>
@@ -324,14 +382,14 @@ export default function Home() {
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={pmChartData}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" textAnchor="end"   interval={0}                 
-  height={60}   tick={{ fontSize: 15 ,fill: "#000000ff",fontWeight: "bold"}}/>
-                      <YAxis  height={60}   tick={{ fontSize: 15 ,fill: "#000000ff",fontWeight: "bold"}}/>
+                      <XAxis dataKey="date" textAnchor="end" interval={0}
+                        height={60} tick={{ fontSize: 15, fill: "#000000ff", fontWeight: "bold" }} />
+                      <YAxis height={60} tick={{ fontSize: 15, fill: "#000000ff", fontWeight: "bold" }} />
                       <Tooltip />
-                   
-                      <Bar dataKey="plan" fill="#2b6cb0"/>
+
+                      <Bar dataKey="plan" fill="#2b6cb0" />
                       <Bar dataKey="actual" fill="#dd6b20" />
-                         <Legend />
+                      <Legend />
                     </BarChart>
                   </ResponsiveContainer>
                 )}
@@ -339,265 +397,280 @@ export default function Home() {
             </div>
 
             {/* PM TABLE */}
-  <div className="col-span-12 bg-white shadow rounded-xl p-0 h-100 flex flex-col">
+            <div className="col-span-12 bg-white shadow rounded-xl p-0 h-100 flex flex-col">
 
-  {/* Sticky Title */}
-  <h3 className="font-bold text-center py-3 text-black 
+              {/* Sticky Title */}
+              <h3 className="font-bold text-center py-3 text-black 
                  sticky top-0 z-20 bg-white shadow-sm">
-    Plant PM Status
-  </h3>
+                Plant PM Status
+              </h3>
 
-  {/* Scrollable Table */}
-  <div className="overflow-auto flex-1">
-    <table className="w-full text-sm table-fixed">
-      <thead>
-        <tr className="bg-blue-700 text-white sticky top-0 z-10">
-          <th className="p-2">Mould Name</th>
-          <th className="p-2">Machine Name</th>
-          <th className="p-2">Next PM</th>
-          <th className="p-2">Warning</th>
-          <th className="p-2">Mould PM Status</th>
-          <th className="p-2">Prod Date</th>
-          <th className="p-2">Shift</th>
-        </tr>
-      </thead>
+              {/* Scrollable Table */}
+              <div className="overflow-auto flex-1">
+                <table className="w-full text-sm table-fixed">
+                  <thead>
+                    <tr className="bg-blue-700 text-white sticky top-0 z-10">
+                      <th className="p-2">Mould Name</th>
+                      <th className="p-2">Machine Name</th>
+                      <th className="p-2">Next PM</th>
+                      <th className="p-2">Warning</th>
+                      <th className="p-2">Mould PM Status</th>
+                      <th className="p-2">Prod Date</th>
+                      <th className="p-2">Shift</th>
+                    </tr>
+                  </thead>
 
-      <tbody>
-        {pmTableApi.map((r, i) => {
-          
-          // -----------------------------
-          // Row Color Logic
-          // -----------------------------
-          let rowColor = "black";
-          // if (r.pmStatus?.toLowerCase() === "warning") rowColor = "bg-yellow-500";
-          // else if (r.pmStatus?.toLowerCase() === "alarm") rowColor = "bg-red-500";
-          // else if (r.pmStatus?.toLowerCase() === "alert") rowColor = "bg-orange-300";
+                  <tbody>
+                    {pmTableApi.map((r, i) => {
 
-          return (
-            <tr 
-              key={i} 
-              className={`border-b h-12 text-center font-bold text-black ${rowColor}`}
-            >
-              <td className="p-2">{r.mouldName}</td>
-              <td className="p-2">{r.equipment}</td>
-              <td className="p-2">{r.nextPmDue}</td>
-              <td className="p-2">{r.nextPmWarning}</td>
-               {/* --- PM STATUS COLOR CODE --- */}
-      <td
-        className={`p-2 font-bold text-black rounded 
-          ${
-            r.pmStatus?.toLowerCase() === "warning"
-              ? "bg-yellow-500 text-black"
-              : r.pmStatus?.toLowerCase() === "alarm"
-              ? "bg-red-800 text-black"
-              : r.pmStatus?.toLowerCase() === "alert"
-              ? "bg-orange-500 text-black"
-              : "bg-gray-200 text-black"
-          }
+                      // -----------------------------
+                      // Row Color Logic
+                      // -----------------------------
+                      let rowColor = "black";
+                               return (
+                        <tr
+                          key={i}
+                          className={`border-b h-12 text-center font-bold text-black ${rowColor}`}
+                        >
+                          <td className="p-2">{r.mouldName}</td>
+                          <td className="p-2">{r.equipment}</td>
+                          <td className="p-2">{r.nextPmDue}</td>
+                          <td className="p-2">{r.nextPmWarning}</td>
+                          {/* --- PM STATUS COLOR CODE --- */}
+                          <td
+                            className={`p-2 font-bold text-black rounded 
+          ${r.pmStatus?.toLowerCase() === "warning"
+                                ? "bg-yellow-500 text-black"
+                                : r.pmStatus?.toLowerCase() === "alarm"
+                                  ? "bg-red-800 text-black"
+                                  : r.pmStatus?.toLowerCase() === "alert"
+                                    ? "bg-orange-500 text-black"
+                                    : "bg-gray-200 text-black"
+                              }
         `}
-      >
-        {r.pmStatus}
-      </td>
-              <td className="p-2">{r.productionDate}</td>
-              <td className="p-2">{r.shift}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  </div>
+                          >
+                            {r.pmStatus}
+                          </td>
+                          <td className="p-2">{r.productionDate}</td>
+                          <td className="p-2">{r.shift}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
 
-</div>
+            </div>
 
 
 
             {/* HC Chart */}
             <div className="col-span-12 bg-white shadow rounded-xl p-2 h-100">
-              <h3 className="font-semibold text-center mb-2 text-black">Plant Health Check</h3>
+              <h3 className="font-semibold text-center mb-2 text-black">
+                Plant HC Plan And Actual
+              </h3>
+
               <div className="h-90">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={hcPlanActual}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" tick={{ fontSize: 15 ,fill: "#000000ff",fontWeight: "bold"}} />
-                    <YAxis tick={{ fontSize: 15 ,fill: "#000000ff",fontWeight: "bold"}} />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="plan" fill="#2b6cb0" />
-                    <Bar dataKey="actual" fill="#dd6b20" />
-                  </BarChart>
-                </ResponsiveContainer>
+                {hcLoading ? (
+                  <div className="flex items-center justify-center h-full">Loading...</div>
+                ) : hcError ? (
+                  <div className="flex items-center justify-center h-full text-red-600">
+                    {hcError}
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={hcChartData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis
+                        dataKey="date"
+                        textAnchor="end"
+                        interval={0}
+                        height={60}
+                        tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }}
+                      />
+                      <YAxis
+                        tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }}
+                      />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="plan" fill="#2b6cb0" />
+                      <Bar dataKey="actual" fill="#dd6b20" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
               </div>
             </div>
 
+
             {/* HC TABLE */}
-<div className="col-span-12 bg-white shadow rounded-xl p-0 h-100 flex flex-col">
+            <div className="col-span-12 bg-white shadow rounded-xl p-0 h-100 flex flex-col">
 
-  {/* Sticky Title */}
-  <h3 className="font-bold text-center py-3 text-black 
+              {/* Sticky Title */}
+              <h3 className="font-bold text-center py-3 text-black 
                  sticky top-0 z-20 bg-white shadow-sm">
-    HC Table
-  </h3>
+                HC Table
+              </h3>
 
-  {/* Scrollable Table */}
-  <div className="overflow-auto flex-1">
-    <table className="w-full text-sm table-fixed">
-      <thead>
-        {/* Table header sticky BELOW the heading */}
-        <tr className="bg-blue-700 text-white sticky top-0 z-10">
-          <th className="p-2">Mould</th>
-          <th className="p-2">Equip</th>
-          <th className="p-2">Next Due</th>
-          <th className="p-2">Warning</th>
-          <th className="p-2">Status</th>
-          <th className="p-2">Prod Date</th>
-          <th className="p-2">Shift</th>
-        </tr>
-      </thead>
+              {/* Scrollable Table */}
+              <div className="overflow-auto flex-1">
+                <table className="w-full text-sm table-fixed">
+                  <thead>
+                    {/* Table header sticky BELOW the heading */}
+                    <tr className="bg-blue-700 text-white sticky top-0 z-10">
+                      <th className="p-2">Mould</th>
+                      <th className="p-2">Equip</th>
+                      <th className="p-2">Next Due</th>
+                      <th className="p-2">Warning</th>
+                      <th className="p-2">Status</th>
+                      <th className="p-2">Prod Date</th>
+                      <th className="p-2">Shift</th>
+                    </tr>
+                  </thead>
 
-      <tbody>
-        {hcTableApi.map((r, i) => (
-          <tr key={i} className="border-b h-12 text-center font-bold text-blue-900">
-            <td className="p-2">{r.mouldName}</td>
-            <td className="p-2">{r.equipment}</td>
-            <td className="p-2">{r.nextDue}</td>
-            <td className="p-2">{r.warning}</td>
-            <td className="p-2">{r.status}</td>
-            <td className="p-2">{r.productionDate}</td>
-            <td className="p-2">{r.shift}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
+                  <tbody>
+                    {hcTableApi.map((r, i) => (
+                      <tr key={i} className="border-b h-12 text-center font-bold text-black">
+                        <td className="p-2">{r.mouldName}</td>
+                        <td className="p-2">{r.equipment}</td>
+                        <td className="p-2">{r.nextDue}</td>
+                        <td className="p-2">{r.warning}</td>
+                        <td className="p-2">{r.status}</td>
+                        <td className="p-2">{r.productionDate}</td>
+                        <td className="p-2">{r.shift}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-</div>
+            </div>
 
 
             {/* BREAKDOWN */}
-<div className="col-span-12 bg-white shadow-lg rounded-xl p-4">
-  <h3 className="font-semibold text-center mb-4 text-black">
-    Breakdown Occurrence & Duration
-  </h3>
+            <div className="col-span-12 bg-white shadow-lg rounded-xl p-4">
+              <h3 className="font-semibold text-center mb-4 text-black">
+                Breakdown Occurrence & Duration
+              </h3>
 
-  <div className="grid grid-cols-2 gap-4">
-    {/* ---------- Duration Chart ---------- */}
-    <div className="bg-white p-2 rounded-xl border shadow">
-      <h4 className="text-center font-semibold mb-2 text-black">Duration</h4>
-   <ResponsiveContainer width="100%" height={350}>
-  <BarChart
-    data={breakdownApiData}
-    margin={{ top: 20, right: 20, left: 20, bottom: 80 }}
-  >
-    <CartesianGrid strokeDasharray="3 3" />
+              <div className="grid grid-cols-2 gap-4">
+                {/* ---------- Duration Chart ---------- */}
+                <div className="bg-white p-2 rounded-xl border shadow">
+                  <h4 className="text-center font-semibold mb-2 text-black">Duration</h4>
+                  <ResponsiveContainer width="100%" height={350}>
+                    <BarChart
+                      data={breakdownApiData}
+                      margin={{ top: 20, right: 20, left: 20, bottom: 80 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
 
-    {/* X-axis = Name */}
-    <XAxis
-      dataKey="cause"
-      tick={{ fontSize: 10, fontWeight: "bold", fill: "#000" }}
-       angle={-20}              // rotate to prevent overlap
-      textAnchor="end"
-      interval={0}             // show all labels
-      height={30}              // give extra space
-    />
+                      {/* X-axis = Name */}
+                      <XAxis
+                        dataKey="cause"
+                        tick={{ fontSize: 10, fontWeight: "bold", fill: "#000" }}
+                        angle={-20}              // rotate to prevent overlap
+                        textAnchor="end"
+                        interval={0}             // show all labels
+                        height={30}              // give extra space
+                      />
 
-    {/* Y-axis = Duration */}
-    <YAxis
-      type="number"
-      tick={{ fontSize: 12, fontWeight: "bold", fill: "#000" }}
-    />
+                      {/* Y-axis = Duration */}
+                      <YAxis
+                        type="number"
+                        tick={{ fontSize: 12, fontWeight: "bold", fill: "#000" }}
+                      />
 
-    <Tooltip />
-    {/* <Legend /> */}
-    <Bar dataKey="duration" fill="#3182ce" name="Duration (min)" />
-  </BarChart>
-</ResponsiveContainer>
+                      <Tooltip />
+                      {/* <Legend /> */}
+                      <Bar dataKey="duration" fill="#3182ce" name="Duration (min)" />
+                    </BarChart>
+                  </ResponsiveContainer>
 
-    </div>
+                </div>
 
-    {/* ---------- Occurrence Chart ---------- */}
-    <div className="bg-white p-2 rounded-xl border shadow">
-      <h4 className="text-center font-semibold mb-2 text-black">Occurrence</h4>
-   <ResponsiveContainer width="100%" height={350}>
-  <BarChart
-    data={breakdownApiData}
-    margin={{ top: 20, right: 20, left: 20, bottom: 80 }}
-  >
-    <CartesianGrid strokeDasharray="3 3" />
+                {/* ---------- Occurrence Chart ---------- */}
+                <div className="bg-white p-2 rounded-xl border shadow">
+                  <h4 className="text-center font-semibold mb-2 text-black">Occurrence</h4>
+                  <ResponsiveContainer width="100%" height={350}>
+                    <BarChart
+                      data={breakdownApiData}
+                      margin={{ top: 20, right: 20, left: 20, bottom: 80 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
 
-    <XAxis
-      dataKey="cause"
-      tick={{ fontSize: 10, fontWeight: "bold", fill: "#000" }}
-      angle={-20}
-      textAnchor="end"
-      interval={0}
-      height={30}
-    />
+                      <XAxis
+                        dataKey="cause"
+                        tick={{ fontSize: 10, fontWeight: "bold", fill: "#000" }}
+                        angle={-20}
+                        textAnchor="end"
+                        interval={0}
+                        height={30}
+                      />
 
-    <YAxis
-      type="number"
-      tick={{ fontSize: 12, fontWeight: "bold", fill: "#000" }}
-    />
+                      <YAxis
+                        type="number"
+                        tick={{ fontSize: 12, fontWeight: "bold", fill: "#000" }}
+                      />
 
-    <Tooltip />
-    {/* <Legend /> */}
-    <Bar dataKey="occurrence" fill="#3182ce" name="Occurrence" />
-  </BarChart>
-</ResponsiveContainer>
+                      <Tooltip />
+                      {/* <Legend /> */}
+                      <Bar dataKey="occurrence" fill="#3182ce" name="Occurrence" />
+                    </BarChart>
+                  </ResponsiveContainer>
 
-    </div>
-  </div>
-</div>
+                </div>
+              </div>
+            </div>
 
 
             {/* ---------- SPARE PART TABLE (INTEGRATED) ---------- */}
             <div className="col-span-12 bg-white shadow rounded-xl p-4 h-80 flex flex-col">
 
-  <h3 className="font-semibold mb-2 text-black text-center">
-    Spare Part Consumption
-  </h3>
+              <h3 className="font-semibold mb-2 text-black text-center">
+                Spare Part Consumption
+              </h3>
 
-  {/* Wrapper for scrollable table */}
-  <div className="flex-1 overflow-auto border rounded-lg">
+              {/* Wrapper for scrollable table */}
+              <div className="flex-1 overflow-auto border rounded-lg">
 
-    {/* show loading / error */}
-    {spareLoading ? (
-      <div className="p-4">Loading spare part data...</div>
-    ) : spareError ? (
-      <div className="p-4 text-red-600">{spareError}</div>
-    ) : spareParts.length === 0 ? (
-      <div className="p-4">No spare part data for selected range.</div>
-    ) : (
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="bg-blue-700 text-white sticky top-0 z-20">
-            <th className="p-2">Mould Name</th>
-            <th className="p-2">Category</th>
-            <th className="p-2">Part Name</th>
-            <th className="p-2">Available Qty</th>
-            <th className="p-2">Used Qty</th>
-            <th className="p-2">Location</th>
-            <th className="p-2">Spare Part Status</th>
-          </tr>
-        </thead>
+                {/* show loading / error */}
+                {spareLoading ? (
+                  <div className="p-4">Loading spare part data...</div>
+                ) : spareError ? (
+                  <div className="p-4 text-red-600">{spareError}</div>
+                ) : spareParts.length === 0 ? (
+                  <div className="p-4">No spare part data for selected range.</div>
+                ) : (
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-blue-700 text-white sticky top-0 z-20">
+                        <th className="p-2">Mould Name</th>
+                        <th className="p-2">Category</th>
+                        <th className="p-2">Part Name</th>
+                        <th className="p-2">Available Qty</th>
+                        <th className="p-2">Used Qty</th>
+                        <th className="p-2">Location</th>
+                        <th className="p-2">Spare Part Status</th>
+                      </tr>
+                    </thead>
 
-        <tbody>
-          {spareParts.map((r, i) => (
-            <tr key={i} className="border-b h-12 text-center font-medium text-blue-900">
-              <td className="p-2">{r.mouldname}</td>
-              <td className="p-2">{r.category}</td>
-              <td className="p-2">{r.partName}</td>
-              <td className="p-2">{r.availableQty}</td>
-              <td className="p-2">{r.usedQty ?? "-"}</td>
-              <td className="p-2">{r.location}</td>
-              <td className="p-2">{r.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    )}
+                    <tbody>
+                      {spareParts.map((r, i) => (
+                        <tr key={i} className="border-b h-12 text-center font-medium text-black">
+                          <td className="p-2">{r.mouldname}</td>
+                          <td className="p-2">{r.category}</td>
+                          <td className="p-2">{r.partName}</td>
+                          <td className="p-2">{r.availableQty}</td>
+                          <td className="p-2">{r.usedQty ?? "-"}</td>
+                          <td className="p-2">{r.location}</td>
+                          <td className="p-2">{r.status}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
 
-  </div>
-</div>
+              </div>
+            </div>
 
           </div>
         </div>
