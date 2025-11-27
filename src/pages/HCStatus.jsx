@@ -161,21 +161,21 @@ const HCStatus = () => {
     <DashboardLayout>
       <div className="p-4">
         {/* 1️⃣ Warning / Alarm / Alert */}
-        <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
+        <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Table which will show the hc Warning / Alarm / Alert status
         </div>
 
         <div
-          className="bg-white shadow-md p-4 rounded-lg mb-6"
+          className="bg-white shadow-md rounded-lg mb-6"
           style={{ maxHeight: "250px", overflowY: "auto" }}
         >
-          <table className="w-full border">
-            <thead className="sticky top-0 z-10 bg-gray-100">
+          <table className="w-full border border-collapse-separate">
+            <thead className="sticky top-0 z-30 bg-blue-700 text-white text-center">
               <tr>
-                <th className="border p-2 bg-gray-100">Mould</th>
-                <th className="border p-2 bg-gray-100">Status</th>
-                <th className="border p-2 bg-gray-100">Next HC Due</th>
-                <th className="border p-2 bg-gray-100">Shot Count</th>
+                <th className="border p-2">Mould</th>
+                <th className="border p-2 ">Status</th>
+                <th className="border p-2 ">Next HC Due</th>
+                <th className="border p-2 ">Shot Count</th>
               </tr>
             </thead>
             <tbody>
@@ -200,10 +200,10 @@ const HCStatus = () => {
               ) : (
                 hcStatusRows.map((row, i) => (
                   <tr key={i}>
-                    <td className="border p-2">{row.mould}</td>
-                    <td className="border p-2">{row.status}</td>
-                    <td className="border p-2">{row.nextHCDueDate}</td>
-                    <td className="border p-2">{row.shotCount}</td>
+                    <td className="border p-2 text-center text-black font-medium">{row.mould}</td>
+                    <td className="border p-2 text-center text-black font-medium">{row.status}</td>
+                    <td className="border p-2 text-center text-black font-medium">{row.nextHCDueDate}</td>
+                    <td className="border p-2 text-center text-black font-medium">{row.shotCount}</td>
                   </tr>
                 ))
               )}
@@ -212,7 +212,7 @@ const HCStatus = () => {
         </div>
 
         {/* 2️⃣ Week Wise Histogram (API: MouldHCWeekWisePlan) */}
-        <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
+        <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Week wise hc Plan Histogram
         </div>
         <div className="bg-white shadow-md p-4 rounded-lg mb-6" style={{ height: 300 }}>
@@ -228,8 +228,8 @@ const HCStatus = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weekWisehcPlan}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="week" />
-                <YAxis />
+                <XAxis dataKey="week"  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }} />
+                <YAxis  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }} />
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="plan" fill="#82ca9d" />
@@ -239,18 +239,18 @@ const HCStatus = () => {
         </div>
 
         {/* 3️⃣ hc in Plan Table (API: MouldWiseHCPlan) */}
-        <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
+        <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Table which will show the hc in Plan
         </div>
         <div
-          className="bg-white shadow-md p-4 rounded-lg mb-6"
+          className="bg-white shadow-md  rounded-lg mb-6"
           style={{ maxHeight: "250px", overflowY: "auto" }}
         >
-          <table className="w-full border">
-            <thead className="sticky top-0 z-10 bg-gray-100">
+          <table className="w-full border border-collapse-separate">
+            <thead className="sticky top-0 z-30 bg-blue-700 text-white text-center">
               <tr>
-                <th className="border p-2 bg-gray-100">Mould</th>
-                <th className="border p-2 bg-gray-100">Plan Date</th>
+                <th className="border p-2 ">Mould</th>
+                <th className="border p-2 ">Plan Date</th>
               </tr>
             </thead>
             <tbody>
@@ -275,8 +275,8 @@ const HCStatus = () => {
               ) : (
                 hcPlanRows.map((row, i) => (
                   <tr key={i}>
-                    <td className="border p-2">{row.mould}</td>
-                    <td className="border p-2">{row.planDate}</td>
+                    <td className="border p-2 text-black text-center font-medium">{row.mould}</td>
+                    <td className="border p-2 text-black text-center font-medium">{row.planDate}</td>
                   </tr>
                 ))
               )}
@@ -285,18 +285,18 @@ const HCStatus = () => {
         </div>
 
         {/* 4️⃣ Duration Table ASC (API: MouldWiseNextHCDuedate) */}
-        <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
+        <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Table which will show the hc by Duration
         </div>
         <div
-          className="bg-white shadow-md p-4 rounded-lg mb-6"
+          className="bg-white shadow-md rounded-lg mb-6"
           style={{ maxHeight: "250px", overflowY: "auto" }}
         >
           <table className="w-full border">
-            <thead className="sticky top-0 z-10 bg-gray-100">
+            <thead className="w-full border border-collapse-separate bg-blue-700 text-white sticky top-0 z-20">
               <tr>
-                <th className="border p-2 bg-gray-100">Mould</th>
-                <th className="border p-2 bg-gray-100">Next HC Date</th>
+                <th className="border p-2 ">Mould</th>
+                <th className="border p-2 ">Next HC Date</th>
               </tr>
             </thead>
             <tbody>
@@ -327,8 +327,8 @@ const HCStatus = () => {
                   )
                   .map((row, i) => (
                     <tr key={i}>
-                      <td className="border p-2">{row.mould}</td>
-                      <td className="border p-2">{row.nextHCDate}</td>
+                      <td className="border p-2 font-medium text-black text-center">{row.mould}</td>
+                      <td className="border p-2 font-medium text-black text-center">{row.nextHCDate}</td>
                     </tr>
                   ))
               )}
@@ -337,15 +337,15 @@ const HCStatus = () => {
         </div>
 
         {/* 5️⃣ Next 6 months chart */}
-        <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
+        <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Chart for showing next 6 months how many mould will come in hc
         </div>
         <div className="bg-white shadow-md p-4 rounded-lg mb-6" style={{ height: 300 }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={nextSixMonthData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
+              <XAxis dataKey="month"  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }}/>
+              <YAxis  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }} />
               <Tooltip />
               <Legend />
               <Bar dataKey="count" fill="#8884d8" />
@@ -354,18 +354,18 @@ const HCStatus = () => {
         </div>
 
         {/* 6️⃣ Shot Count ASC (API: MouldWiseNextHCDueByShot) */}
-        <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
+        <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Table which will show the hc by Shot Count
         </div>
         <div
-          className="bg-white shadow-md p-4 rounded-lg mb-6"
+          className="bg-white shadow-md rounded-lg mb-6"
           style={{ maxHeight: "250px", overflowY: "auto" }}
         >
-          <table className="w-full border">
-            <thead className="sticky top-0 z-10 bg-gray-100">
+          <table className="w-full border border-collapse-separate">
+            <thead className="sticky top-0 z-30 bg-blue-700 text-white text-center">
               <tr>
-                <th className="border p-2 bg-gray-100">Mould</th>
-                <th className="border p-2 bg-gray-100">Shot Count</th>
+                <th className="border p-2 ">Mould</th>
+                <th className="border p-2 ">Shot Count</th>
               </tr>
             </thead>
             <tbody>
@@ -393,8 +393,8 @@ const HCStatus = () => {
                   .sort((a, b) => a.shotCount - b.shotCount)
                   .map((row, i) => (
                     <tr key={i}>
-                      <td className="border p-2">{row.mould}</td>
-                      <td className="border p-2">{row.shotCount}</td>
+                      <td className="border p-2 font-medium text-black text-center">{row.mould}</td>
+                      <td className="border p-2 font-medium text-black text-center">{row.shotCount}</td>
                     </tr>
                   ))
               )}

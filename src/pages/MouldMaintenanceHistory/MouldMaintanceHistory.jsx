@@ -331,7 +331,7 @@ export default function MouldMaintenanceHistory() {
 
         {/* TABLE SECTION */}
         <div className="bg-white rounded-xl shadow p-6">
-          <h3 className="text-2xl font-bold mb-4 text-gray-900 text-center">Mould PM Details</h3>
+          <h3 className="text-2xl font-medium mb-4 text-black text-center">Mould PM Details</h3>
 
           {loadingTable ? (
             <div className="p-6 flex items-center justify-center">Loading PM details...</div>
@@ -349,18 +349,18 @@ export default function MouldMaintenanceHistory() {
               {/* Inner wrapper ensures table can be wider than container to show horizontal scrollbar */}
               <div style={{ minWidth: 1200 }}>
                 <table className="w-full border-collapse">
-                  <thead className="bg-gray-900 text-white">
+                  <thead className="bg-gray-900 text-white text-xs">
                     <tr>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">Checklist</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">Instance</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">Mould Name</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">Material Name</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">User Name</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">PM Status</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">Duration (min)</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">At Mould Life</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">Start Time</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">Remark</th>
+                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Checklist</th>
+                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Instance</th>
+                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Mould Name</th>
+                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Material Name</th>
+                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">User Name</th>
+                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">PM Status</th>
+                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Duration (min)</th>
+                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">At Mould Life</th>
+                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Start Time</th>
+                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Remark</th>
                     </tr>
                   </thead>
 
@@ -372,16 +372,16 @@ export default function MouldMaintenanceHistory() {
                     ) : (
                       pmTableData.map((row, index) => (
                         <tr key={row.key ?? index} className="text-center border ">
-                          <td className="p-3 border text-left whitespace-nowrap text-center font-bold text-blue-900">{row.checkListName}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.instance}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.mouldName}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.materialName}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.userId}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.pmStatus}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.pmDuration}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{row.atMouldLife ?? "-"}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-bold text-blue-900">{formatFriendlyDate(row.startTime)}</td>
-                          <td className="p-3 border text-left whitespace-nowrap text-center font-bold text-blue-900">{row.remark || "-"}</td>
+                          <td className="p-3 border text-left whitespace-nowrap text-center font-medium text-black">{row.checkListName}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.instance}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.mouldName}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.materialName}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.userId}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.pmStatus}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.pmDuration}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.atMouldLife ?? "-"}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{formatFriendlyDate(row.startTime)}</td>
+                          <td className="p-3 border text-left whitespace-nowrap text-center font-medium text-black">{row.remark || "-"}</td>
                         </tr>
                       ))
                     )}

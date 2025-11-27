@@ -162,21 +162,23 @@ const PMStatus = () => {
     <DashboardLayout>
       <div className="p-4">
         {/* 1️⃣ Warning / Alarm / Alert */}
-        <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
-          Table which will show the PM Warning / Alarm / Alert status
-        </div>
+     <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
+  Table which will show the PM Warning / Alarm / Alert status
+</div>
+
+
 
         <div
-          className="bg-white shadow-md p-4 rounded-lg mb-6"
+          className="bg-white shadow-md  rounded-lg mb-6"
           style={{ maxHeight: "250px", overflowY: "auto" }}
         >
-          <table className="w-full border">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border p-2 ">Mould</th>
-                <th className="border p-2">Status</th>
-                <th className="border p-2">Next PM Due</th>
-                <th className="border p-2">Shot Count</th>
+          <table className="w-full border border-collapse-separate">
+            <thead className="sticky top-0 z-30 bg-blue-700">
+              <tr className="bg-blue-700 text-white sticky top-0 z-10">
+                <th className="border p-2 text-white text-center">Mould</th>
+                <th className="border p-2 ttext-white text-center">Status</th>
+                <th className="border p-2 text-white text-center">Next PM Due</th>
+                <th className="border p-2 text-white text-center">Shot Count</th>
               </tr>
             </thead>
             <tbody>
@@ -201,10 +203,10 @@ const PMStatus = () => {
               ) : (
                 pmStatusRows.map((row, i) => (
                   <tr key={i}>
-                    <td className="border p-2">{row.mould}</td>
-                    <td className="border p-2">{row.status}</td>
-                    <td className="border p-2">{row.nextPMDueDate}</td>
-                    <td className="border p-2">{row.shotCount}</td>
+                    <td className="border p-2 text-black text-center">{row.mould}</td>
+                    <td className="border p-2 text-black text-center">{row.status}</td>
+                    <td className="border p-2 text-black text-center">{row.nextPMDueDate}</td>
+                    <td className="border p-2 text-black text-center">{row.shotCount}</td>
                   </tr>
                 ))
               )}
@@ -213,7 +215,7 @@ const PMStatus = () => {
         </div>
 
         {/* 2️⃣ Week Wise Histogram */}
-        <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
+        <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Week wise PM Plan Histogram
         </div>
         <div
@@ -232,8 +234,8 @@ const PMStatus = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weekWisePMPlan}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="week" />
-                <YAxis />
+                <XAxis dataKey="week"  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }}/>
+                <YAxis  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }} />
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="plan" fill="#82ca9d" />
@@ -243,64 +245,46 @@ const PMStatus = () => {
         </div>
 
         {/* 3️⃣ PM in Plan Table (API: MouldWisePMPlan) */}
-        <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
+        <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Table which will show the PM in Plan
         </div>
         <div
-          className="bg-white shadow-md p-4 rounded-lg mb-6"
-          style={{ maxHeight: "250px", overflowY: "auto" }}
-        >
-          <table className="w-full border">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border p-2">Mould</th>
-                <th className="border p-2">Plan Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loadingPmPlan ? (
-                <tr>
-                  <td colSpan={2} className="border p-2 text-center">
-                    Loading...
-                  </td>
-                </tr>
-              ) : pmPlanError ? (
-                <tr>
-                  <td colSpan={2} className="border p-2 text-center text-red-600">
-                    {pmPlanError}
-                  </td>
-                </tr>
-              ) : pmPlanRows.length === 0 ? (
-                <tr>
-                  <td colSpan={2} className="border p-2 text-center">
-                    No data available.
-                  </td>
-                </tr>
-              ) : (
-                pmPlanRows.map((row, i) => (
-                  <tr key={i}>
-                    <td className="border p-2">{row.mould}</td>
-                    <td className="border p-2">{row.planDate}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+  className="bg-white shadow-md rounded-lg mb-6"
+  style={{ maxHeight: "250px", overflowY: "auto" }}
+>
+  <table className="w-full border border-collapse-separate">
+    <thead className="sticky top-0 z-30 bg-blue-700">
+      <tr>
+        <th className="border p-2 text-white text-center">Mould</th>
+        <th className="border p-2 text-white text-center">Plan Date</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {pmPlanRows.map((row, i) => (
+        <tr key={i} className="bg-white text-black">
+          <td className="border p-2">{row.mould}</td>
+          <td className="border p-2">{row.planDate}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
 
         {/* 4️⃣ PM Due Date Table ASC (API: MouldWiseNextPMDuedate) */}
-        <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
+        <div className="bg-blue-900  text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Table which will show Next PM By Date
         </div>
         <div
-          className="bg-white shadow-md p-4 rounded-lg mb-6"
+          className="bg-white shadow-md  rounded-lg mb-6"
           style={{ maxHeight: "250px", overflowY: "auto" }}
         >
-          <table className="w-full border">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border p-2">Mould</th>
-                <th className="border p-2">Duration</th>
+          <table className="w-full border border-collapse-separate">
+            <thead className="bg-blue-700 text-white sticky top-0 z-30" >
+              <tr >
+                <th className="border p-2  text-center">Mould</th>
+                <th className="border p-2  text-center">Duration</th>
               </tr>
             </thead>
             <tbody>
@@ -331,8 +315,8 @@ const PMStatus = () => {
                   )
                   .map((row, i) => (
                     <tr key={i}>
-                      <td className="border p-2">{row.mould}</td>
-                      <td className="border p-2">{row.nextPMDate}</td>
+                      <td className="border p-2 text-black text-center">{row.mould}</td>
+                      <td className="border p-2 text-black text-center">{row.nextPMDate}</td>
                     </tr>
                   ))
               )}
@@ -341,7 +325,7 @@ const PMStatus = () => {
         </div>
 
         {/* 5️⃣ Next 6 months chart */}
-        <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
+        <div className="bg-blue-900  text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Chart for showing next 6 months how many mould will come in PM
         </div>
         <div
@@ -351,8 +335,8 @@ const PMStatus = () => {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={nextSixMonthData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
+              <XAxis dataKey="month"  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }} />
+              <YAxis  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }} />
               <Tooltip />
               <Legend />
               <Bar dataKey="count" fill="#8884d8" />
@@ -361,16 +345,16 @@ const PMStatus = () => {
         </div>
 
         {/* 6️⃣ Shot Count ASC (API: MouldWiseNextPMDueByShot) */}
-        <div className="bg-blue-700 text-white p-3 rounded-lg mb-3 font-semibold">
+        <div className="bg-blue-900  text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Table which will show the PM by Shot Count
         </div>
         <div
-          className="bg-white shadow-md p-4 rounded-lg mb-6"
+          className="bg-white shadow-md  rounded-lg mb-6"
           style={{ maxHeight: "250px", overflowY: "auto" }}
         >
-          <table className="w-full border">
-            <thead>
-              <tr className="bg-gray-100">
+          <table className="w-full border border-collapse-separate">
+            <thead className="sticky top-0 z-30 bg-blue-700 text-white">
+              <tr >
                 <th className="border p-2">Mould</th>
                 <th className="border p-2">Shot Count</th>
               </tr>
@@ -400,8 +384,8 @@ const PMStatus = () => {
                   .sort((a, b) => a.shotCount - b.shotCount)
                   .map((row, i) => (
                     <tr key={i}>
-                      <td className="border p-2">{row.mould}</td>
-                      <td className="border p-2">{row.shotCount}</td>
+                      <td className="border p-2 text-center text-black">{row.mould}</td>
+                      <td className="border p-2 text-center text-black">{row.shotCount}</td>
                     </tr>
                   ))
               )}

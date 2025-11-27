@@ -433,25 +433,25 @@ const BreakDownHistory = () => {
                 <table className="w-full border-collapse">   {/* <-- FIXED WIDTH TABLE */}
                   <thead className="bg-blue-900 text-white text-xs">
                     <tr>
-                      <th className="p-2 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">BreakDownID</th>
-                      <th className="p-2 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">BreakDown Reason</th>
-                      <th className="p-2 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">BreakDown Remark</th>
-                      <th className="p-2 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">Mould Name</th>
-                      <th className="p-2 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">Start Time</th>
-                      <th className="p-2 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">End Time</th>
-                      <th className="p-2 border whitespace-nowrap sticky top-0 bg-blue-900 z-10">Duration</th>
+                      <th className="p-2 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">BreakDownID</th>
+                      <th className="p-2 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">BreakDown Reason</th>
+                      <th className="p-2 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">BreakDown Remark</th>
+                      <th className="p-2 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Mould Name</th>
+                      <th className="p-2 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Start Time</th>
+                      <th className="p-2 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">End Time</th>
+                      <th className="p-2 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Duration</th>
                     </tr>
                   </thead>
                   <tbody>
                     {tableData.map((r, index) => (
                       <tr key={index} className="hover:bg-gray-100">
-                        <td className="p-2 border text-center font-bold text-blue-900">{r.BreakDownID}</td>
-                        <td className="p-2 border text-center font-bold text-blue-900">{r.Reason}</td>
-                        <td className="p-2 border text-center font-bold text-blue-900">{r.Remark}</td>
-                        <td className="p-2 border text-center font-bold text-blue-900">{r.MouldName}</td>
-                        <td className="p-2 border text-center font-bold text-blue-900">{r.StartTime}</td>
-                        <td className="p-2 border text-center font-bold text-blue-900">{r.EndTime}</td>
-                        <td className="p-2 border text-center font-bold text-blue-900">{r.Duration}</td>
+                        <td className="p-2 border text-center font-medium text-black">{r.BreakDownID}</td>
+                        <td className="p-2 border text-center font-medium text-black">{r.Reason}</td>
+                        <td className="p-2 border text-center font-medium text-black">{r.Remark}</td>
+                        <td className="p-2 border text-center font-medium text-black">{r.MouldName}</td>
+                        <td className="p-2 border text-center font-medium text-black">{r.StartTime}</td>
+                        <td className="p-2 border text-center font-medium text-black">{r.EndTime}</td>
+                        <td className="p-2 border text-center font-medium text-black">{r.Duration}</td>
                       </tr>
                     ))}
                     {tableData.length === 0 && (

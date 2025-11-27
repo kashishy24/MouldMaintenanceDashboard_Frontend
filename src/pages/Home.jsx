@@ -430,7 +430,7 @@ export default function Home() {
                                return (
                         <tr
                           key={i}
-                          className={`border-b h-12 text-center font-bold text-black ${rowColor}`}
+                          className={`border-b h-12 text-center font-medium text-black ${rowColor}`}
                         >
                           <td className="p-2">{r.mouldName}</td>
                           <td className="p-2">{r.equipment}</td>
@@ -529,7 +529,7 @@ export default function Home() {
 
                   <tbody>
                     {hcTableApi.map((r, i) => (
-                      <tr key={i} className="border-b h-12 text-center font-bold text-black">
+                      <tr key={i} className="border-b h-12 text-center font-medium text-black">
                         <td className="p-2">{r.mouldName}</td>
                         <td className="p-2">{r.equipment}</td>
                         <td className="p-2">{r.nextDue}</td>
