@@ -16,11 +16,13 @@ import axios from "axios";
 const BASE = (
   import.meta.env.VITE_BACKEND_BASE_URL || "http://192.168.1.14:3004/api"
 ).replace(/\/+$/, "");
+
 const HC_STATUS_ENDPOINT = `${BASE}/HCStatus/MouldHCStatus`;
 const HC_WEEKWISE_ENDPOINT = `${BASE}/HCStatus/MouldHCWeekWisePlan`;
 const HC_MOULDWISE_PLAN_ENDPOINT = `${BASE}/HCStatus/MouldWiseHCPlan`;
 const HC_NEXT_DUE_ENDPOINT = `${BASE}/HCStatus/MouldWiseNextHCDuedate`;
 const HC_NEXT_DUE_BY_SHOT_ENDPOINT = `${BASE}/HCStatus/MouldWiseNextHCDueByShot`;
+const HC_NEXT6_ENDPOINT = `${BASE}/HCStatus/DashboardNext6MonthHCPlan`; // ✅ NEW
 
 // 🔹 Helper to format date
 const formatDate = (iso) => {
@@ -33,43 +35,36 @@ const formatDate = (iso) => {
   }
 };
 
-// ⛔️ hcByShotCountData dummy REMOVED
-// ⛔️ hcByData dummy already removed in previous step
-
-const nextSixMonthData = [
-  { month: "Dec", count: 12 },
-  { month: "Jan", count: 9 },
-  { month: "Feb", count: 10 },
-  { month: "Mar", count: 7 },
-  { month: "Apr", count: 11 },
-  { month: "May", count: 8 },
-];
-
 const HCStatus = () => {
-  // 🔹 1) HC Warning / Alarm / Alert table (API)
+  // 1) HC Warning / Alarm / Alert table
   const [hcStatusRows, setHcStatusRows] = useState([]);
   const [loadingHC, setLoadingHC] = useState(false);
   const [hcError, setHcError] = useState(null);
 
-  // 🔹 2) Week-wise HC plan histogram (API)
+  // 2) Week-wise HC plan histogram
   const [weekWisehcPlan, setWeekWisehcPlan] = useState([]);
   const [loadingWeekPlan, setLoadingWeekPlan] = useState(false);
   const [weekPlanError, setWeekPlanError] = useState(null);
 
-  // 🔹 3) HC in Plan table (Mould-wise HC plan, API)
+  // 3) HC in Plan table
   const [hcPlanRows, setHcPlanRows] = useState([]);
   const [loadingHcPlan, setLoadingHcPlan] = useState(false);
   const [hcPlanError, setHcPlanError] = useState(null);
 
-  // 🔹 4) Next HC Date table (API: MouldWiseNextHCDuedate)
+  // 4) Next HC Date table
   const [nextHcRows, setNextHcRows] = useState([]);
   const [loadingNextHc, setLoadingNextHc] = useState(false);
   const [nextHcError, setNextHcError] = useState(null);
 
-  // 🔹 5) HC by Shot Count table (API: MouldWiseNextHCDueByShot)
+  // 5) HC by Shot Count table
   const [hcShotRows, setHcShotRows] = useState([]);
   const [loadingHcShot, setLoadingHcShot] = useState(false);
   const [hcShotError, setHcShotError] = useState(null);
+
+  // 6) Next 6 months HC plan (API-driven)
+  const [next6MonthsPlan, setNext6MonthsPlan] = useState([]);
+  const [loadingNext6, setLoadingNext6] = useState(false);
+  const [next6Error, setNext6Error] = useState(null);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -88,14 +83,19 @@ const HCStatus = () => {
       setLoadingHcShot(true);
       setHcShotError(null);
 
+      setLoadingNext6(true);
+      setNext6Error(null);
+
       try {
-        const [hcRes, weekRes, planRes, nextRes, shotRes] = await Promise.all([
-          axios.get(HC_STATUS_ENDPOINT),
-          axios.get(HC_WEEKWISE_ENDPOINT),
-          axios.get(HC_MOULDWISE_PLAN_ENDPOINT),
-          axios.get(HC_NEXT_DUE_ENDPOINT),
-          axios.get(HC_NEXT_DUE_BY_SHOT_ENDPOINT),
-        ]);
+        const [hcRes, weekRes, planRes, nextRes, shotRes, next6Res] =
+          await Promise.all([
+            axios.get(HC_STATUS_ENDPOINT),
+            axios.get(HC_WEEKWISE_ENDPOINT),
+            axios.get(HC_MOULDWISE_PLAN_ENDPOINT),
+            axios.get(HC_NEXT_DUE_ENDPOINT),
+            axios.get(HC_NEXT_DUE_BY_SHOT_ENDPOINT),
+            axios.get(HC_NEXT6_ENDPOINT), // ✅ NEW
+          ]);
 
         // ---- HC status mapping ----
         const rows = hcRes?.data?.data ?? [];
@@ -115,7 +115,7 @@ const HCStatus = () => {
         }));
         setWeekWisehcPlan(mappedWeek);
 
-        // ---- Mould-wise HC plan (hc in Plan table) mapping ----
+        // ---- Mould-wise HC plan mapping ----
         const planRows = planRes?.data?.data ?? [];
         const mappedPlan = planRows.map((r) => ({
           mould: r.MouldName || r.MouldID,
@@ -138,6 +138,28 @@ const HCStatus = () => {
           shotCount: r.HealthCheckDue ?? 0,
         }));
         setHcShotRows(mappedShot);
+
+        // ---- Next 6 months HC Plan mapping (NEW) ----
+        const next6Rows = next6Res?.data?.data ?? [];
+        const mappedNext6 = next6Rows.map((r) => {
+          // r.Month like "2025-11" → label "Nov"
+          const raw = String(r.Month);
+          let monthLabel = raw;
+          const parts = raw.split("-");
+          if (parts.length === 2) {
+            const y = Number(parts[0]);
+            const m = Number(parts[1]);
+            const dt = new Date(y, m - 1, 1);
+            if (!isNaN(dt.getTime())) {
+              monthLabel = dt.toLocaleString("default", { month: "short" });
+            }
+          }
+          return {
+            month: monthLabel,
+            count: r.MouldsDueForHC ?? 0,
+          };
+        });
+        setNext6MonthsPlan(mappedNext6);
       } catch (err) {
         console.error("Failed to load HC data:", err);
         setHcError("Failed to load HC Warning / Alarm / Alert status.");
@@ -145,12 +167,14 @@ const HCStatus = () => {
         setHcPlanError("Failed to load HC in Plan data.");
         setNextHcError("Failed to load Next HC By Date data.");
         setHcShotError("Failed to load HC by Shot Count data.");
+        setNext6Error("Failed to load next 6 months HC plan.");
       } finally {
         setLoadingHC(false);
         setLoadingWeekPlan(false);
         setLoadingHcPlan(false);
         setLoadingNextHc(false);
         setLoadingHcShot(false);
+        setLoadingNext6(false);
       }
     };
 
@@ -173,9 +197,9 @@ const HCStatus = () => {
             <thead className="sticky top-0 z-30 bg-blue-700 text-white text-center">
               <tr>
                 <th className="border p-2">Mould</th>
-                <th className="border p-2 ">Status</th>
-                <th className="border p-2 ">Next HC Due</th>
-                <th className="border p-2 ">Shot Count</th>
+                <th className="border p-2">Status</th>
+                <th className="border p-2">Next HC Due</th>
+                <th className="border p-2">Shot Count</th>
               </tr>
             </thead>
             <tbody>
@@ -200,10 +224,18 @@ const HCStatus = () => {
               ) : (
                 hcStatusRows.map((row, i) => (
                   <tr key={i}>
-                    <td className="border p-2 text-center text-black font-medium">{row.mould}</td>
-                    <td className="border p-2 text-center text-black font-medium">{row.status}</td>
-                    <td className="border p-2 text-center text-black font-medium">{row.nextHCDueDate}</td>
-                    <td className="border p-2 text-center text-black font-medium">{row.shotCount}</td>
+                    <td className="border p-2 text-center text-black font-medium">
+                      {row.mould}
+                    </td>
+                    <td className="border p-2 text-center text-black font-medium">
+                      {row.status}
+                    </td>
+                    <td className="border p-2 text-center text-black font-medium">
+                      {row.nextHCDueDate}
+                    </td>
+                    <td className="border p-2 text-center text-black font-medium">
+                      {row.shotCount}
+                    </td>
                   </tr>
                 ))
               )}
@@ -211,7 +243,7 @@ const HCStatus = () => {
           </table>
         </div>
 
-        {/* 2️⃣ Week Wise Histogram (API: MouldHCWeekWisePlan) */}
+        {/* 2️⃣ Week Wise Histogram */}
         <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Week wise hc Plan Histogram
         </div>
@@ -228,8 +260,13 @@ const HCStatus = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weekWisehcPlan}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="week"  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }} />
-                <YAxis  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }} />
+                <XAxis
+                  dataKey="week"
+                  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }}
+                />
+                <YAxis
+                  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }}
+                />
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="plan" fill="#82ca9d" />
@@ -238,7 +275,7 @@ const HCStatus = () => {
           )}
         </div>
 
-        {/* 3️⃣ hc in Plan Table (API: MouldWiseHCPlan) */}
+        {/* 3️⃣ hc in Plan Table */}
         <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Table which will show the hc in Plan
         </div>
@@ -249,8 +286,8 @@ const HCStatus = () => {
           <table className="w-full border border-collapse-separate">
             <thead className="sticky top-0 z-30 bg-blue-700 text-white text-center">
               <tr>
-                <th className="border p-2 ">Mould</th>
-                <th className="border p-2 ">Plan Date</th>
+                <th className="border p-2">Mould</th>
+                <th className="border p-2">Plan Date</th>
               </tr>
             </thead>
             <tbody>
@@ -275,8 +312,12 @@ const HCStatus = () => {
               ) : (
                 hcPlanRows.map((row, i) => (
                   <tr key={i}>
-                    <td className="border p-2 text-black text-center font-medium">{row.mould}</td>
-                    <td className="border p-2 text-black text-center font-medium">{row.planDate}</td>
+                    <td className="border p-2 text-black text-center font-medium">
+                      {row.mould}
+                    </td>
+                    <td className="border p-2 text-black text-center font-medium">
+                      {row.planDate}
+                    </td>
                   </tr>
                 ))
               )}
@@ -284,7 +325,7 @@ const HCStatus = () => {
           </table>
         </div>
 
-        {/* 4️⃣ Duration Table ASC (API: MouldWiseNextHCDuedate) */}
+        {/* 4️⃣ Duration Table ASC */}
         <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Table which will show the hc by Duration
         </div>
@@ -295,8 +336,8 @@ const HCStatus = () => {
           <table className="w-full border">
             <thead className="w-full border border-collapse-separate bg-blue-700 text-white sticky top-0 z-20">
               <tr>
-                <th className="border p-2 ">Mould</th>
-                <th className="border p-2 ">Next HC Date</th>
+                <th className="border p-2">Mould</th>
+                <th className="border p-2">Next HC Date</th>
               </tr>
             </thead>
             <tbody>
@@ -322,13 +363,16 @@ const HCStatus = () => {
                 nextHcRows
                   .slice()
                   .sort(
-                    (a, b) =>
-                      new Date(a.nextHCDate) - new Date(b.nextHCDate)
+                    (a, b) => new Date(a.nextHCDate) - new Date(b.nextHCDate)
                   )
                   .map((row, i) => (
                     <tr key={i}>
-                      <td className="border p-2 font-medium text-black text-center">{row.mould}</td>
-                      <td className="border p-2 font-medium text-black text-center">{row.nextHCDate}</td>
+                      <td className="border p-2 font-medium text-black text-center">
+                        {row.mould}
+                      </td>
+                      <td className="border p-2 font-medium text-black text-center">
+                        {row.nextHCDate}
+                      </td>
                     </tr>
                   ))
               )}
@@ -336,24 +380,42 @@ const HCStatus = () => {
           </table>
         </div>
 
-        {/* 5️⃣ Next 6 months chart */}
+        {/* 5️⃣ Next 6 months chart (API-driven) */}
         <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Chart for showing next 6 months how many mould will come in hc
         </div>
-        <div className="bg-white shadow-md p-4 rounded-lg mb-6" style={{ height: 300 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={nextSixMonthData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month"  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }}/>
-              <YAxis  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="count" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
+        <div
+          className="bg-white shadow-md p-4 rounded-lg mb-6"
+          style={{ height: 300 }}
+        >
+          {loadingNext6 ? (
+            <div className="w-full h-full flex items-center justify-center">
+              Loading chart...
+            </div>
+          ) : next6Error ? (
+            <div className="w-full h-full flex items-center justify-center text-red-600">
+              {next6Error}
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={next6MonthsPlan}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="month"
+                  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }}
+                />
+                <YAxis
+                  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }}
+                />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="count" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
-        {/* 6️⃣ Shot Count ASC (API: MouldWiseNextHCDueByShot) */}
+        {/* 6️⃣ Shot Count ASC */}
         <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Table which will show the hc by Shot Count
         </div>
@@ -364,8 +426,8 @@ const HCStatus = () => {
           <table className="w-full border border-collapse-separate">
             <thead className="sticky top-0 z-30 bg-blue-700 text-white text-center">
               <tr>
-                <th className="border p-2 ">Mould</th>
-                <th className="border p-2 ">Shot Count</th>
+                <th className="border p-2">Mould</th>
+                <th className="border p-2">Shot Count</th>
               </tr>
             </thead>
             <tbody>
@@ -393,8 +455,12 @@ const HCStatus = () => {
                   .sort((a, b) => a.shotCount - b.shotCount)
                   .map((row, i) => (
                     <tr key={i}>
-                      <td className="border p-2 font-medium text-black text-center">{row.mould}</td>
-                      <td className="border p-2 font-medium text-black text-center">{row.shotCount}</td>
+                      <td className="border p-2 font-medium text-black text-center">
+                        {row.mould}
+                      </td>
+                      <td className="border p-2 font-medium text-black text-center">
+                        {row.shotCount}
+                      </td>
                     </tr>
                   ))
               )}

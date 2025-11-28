@@ -21,6 +21,7 @@ const PM_WEEKWISE_ENDPOINT = `${BASE}/PMStatus/MouldPMWeekWisePlan`;
 const PM_MOULDWISE_PLAN_ENDPOINT = `${BASE}/PMStatus/MouldWisePMPlan`;
 const PM_NEXT_DUE_ENDPOINT = `${BASE}/PMStatus/MouldWiseNextPMDuedate`;
 const PM_NEXT_DUE_BY_SHOT_ENDPOINT = `${BASE}/PMStatus/MouldWiseNextPMDueByShot`;
+const PM_NEXT6_ENDPOINT = `${BASE}/PMStatus/DashboardNext6MonthPMPlan`; // 🔹 NEW
 
 // 🔹 Helper to format date
 const formatDate = (iso) => {
@@ -32,17 +33,6 @@ const formatDate = (iso) => {
     return iso;
   }
 };
-
-// ⛔️ pmByShotCountData DUMMY REMOVED
-
-const nextSixMonthData = [
-  { month: "Dec", count: 12 },
-  { month: "Jan", count: 9 },
-  { month: "Feb", count: 10 },
-  { month: "Mar", count: 7 },
-  { month: "Apr", count: 11 },
-  { month: "May", count: 8 },
-];
 
 const PMStatus = () => {
   // 1️⃣ Top PM Warning/Alarm table
@@ -70,6 +60,11 @@ const PMStatus = () => {
   const [loadingPmShot, setLoadingPmShot] = useState(false);
   const [pmShotError, setPmShotError] = useState(null);
 
+  // 6️⃣ Next 6 months PM plan (NEW, replaces dummy data)
+  const [next6MonthsPlan, setNext6MonthsPlan] = useState([]);
+  const [loadingNext6, setLoadingNext6] = useState(false);
+  const [next6Error, setNext6Error] = useState(null);
+
   useEffect(() => {
     const fetchAll = async () => {
       // flags
@@ -88,15 +83,25 @@ const PMStatus = () => {
       setLoadingPmShot(true);
       setPmShotError(null);
 
+      setLoadingNext6(true);
+      setNext6Error(null);
+
       try {
-        const [pmRes, weekRes, mouldPlanRes, nextPmRes, nextShotRes] =
-          await Promise.all([
-            axios.get(PM_STATUS_ENDPOINT),
-            axios.get(PM_WEEKWISE_ENDPOINT),
-            axios.get(PM_MOULDWISE_PLAN_ENDPOINT),
-            axios.get(PM_NEXT_DUE_ENDPOINT),
-            axios.get(PM_NEXT_DUE_BY_SHOT_ENDPOINT),
-          ]);
+        const [
+          pmRes,
+          weekRes,
+          mouldPlanRes,
+          nextPmRes,
+          nextShotRes,
+          next6Res, // 🔹 NEW
+        ] = await Promise.all([
+          axios.get(PM_STATUS_ENDPOINT),
+          axios.get(PM_WEEKWISE_ENDPOINT),
+          axios.get(PM_MOULDWISE_PLAN_ENDPOINT),
+          axios.get(PM_NEXT_DUE_ENDPOINT),
+          axios.get(PM_NEXT_DUE_BY_SHOT_ENDPOINT),
+          axios.get(PM_NEXT6_ENDPOINT),
+        ]);
 
         // ---- PM status mapping ----
         const pmRows = pmRes?.data?.data ?? [];
@@ -139,6 +144,28 @@ const PMStatus = () => {
           shotCount: r.NextPMDue ?? 0,
         }));
         setPmShotRows(mappedShot);
+
+        // ---- Next 6 months PM Plan (NEW) ----
+        const next6Rows = next6Res?.data?.data ?? [];
+        const mappedNext6 = next6Rows.map((r) => {
+          // r.Month is "YYYY-MM" => convert to "Dec", "Jan", etc.
+          const raw = String(r.Month);
+          let monthLabel = raw;
+          const parts = raw.split("-");
+          if (parts.length === 2) {
+            const y = Number(parts[0]);
+            const m = Number(parts[1]);
+            const dt = new Date(y, m - 1, 1);
+            if (!isNaN(dt.getTime())) {
+              monthLabel = dt.toLocaleString("default", { month: "short" }); // Dec, Jan...
+            }
+          }
+          return {
+            month: monthLabel,
+            count: r.MouldsDueForPM ?? 0,
+          };
+        });
+        setNext6MonthsPlan(mappedNext6);
       } catch (err) {
         console.error("Error loading PM status data:", err);
         setPmError("Failed to load PM Warning / Alarm / Alert status.");
@@ -146,12 +173,14 @@ const PMStatus = () => {
         setPmPlanError("Failed to load mould-wise PM plan.");
         setNextPmError("Failed to load Next PM By Date data.");
         setPmShotError("Failed to load PM By Shot Count data.");
+        setNext6Error("Failed to load next 6 months PM plan.");
       } finally {
         setLoadingPM(false);
         setLoadingWeekPlan(false);
         setLoadingPmPlan(false);
         setLoadingNextPm(false);
         setLoadingPmShot(false);
+        setLoadingNext6(false);
       }
     };
 
@@ -162,11 +191,9 @@ const PMStatus = () => {
     <DashboardLayout>
       <div className="p-4">
         {/* 1️⃣ Warning / Alarm / Alert */}
-     <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
-  Table which will show the PM Warning / Alarm / Alert status
-</div>
-
-
+        <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
+          Table which will show the PM Warning / Alarm / Alert status
+        </div>
 
         <div
           className="bg-white shadow-md  rounded-lg mb-6"
@@ -177,8 +204,12 @@ const PMStatus = () => {
               <tr className="bg-blue-700 text-white sticky top-0 z-10">
                 <th className="border p-2 text-white text-center">Mould</th>
                 <th className="border p-2 ttext-white text-center">Status</th>
-                <th className="border p-2 text-white text-center">Next PM Due</th>
-                <th className="border p-2 text-white text-center">Shot Count</th>
+                <th className="border p-2 text-white text-center">
+                  Next PM Due
+                </th>
+                <th className="border p-2 text-white text-center">
+                  Shot Count
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -190,7 +221,10 @@ const PMStatus = () => {
                 </tr>
               ) : pmError ? (
                 <tr>
-                  <td colSpan={4} className="border p-2 text-center text-red-600">
+                  <td
+                    colSpan={4}
+                    className="border p-2 text-center text-red-600"
+                  >
                     {pmError}
                   </td>
                 </tr>
@@ -203,10 +237,18 @@ const PMStatus = () => {
               ) : (
                 pmStatusRows.map((row, i) => (
                   <tr key={i}>
-                    <td className="border p-2 text-black text-center">{row.mould}</td>
-                    <td className="border p-2 text-black text-center">{row.status}</td>
-                    <td className="border p-2 text-black text-center">{row.nextPMDueDate}</td>
-                    <td className="border p-2 text-black text-center">{row.shotCount}</td>
+                    <td className="border p-2 text-black text-center">
+                      {row.mould}
+                    </td>
+                    <td className="border p-2 text-black text-center">
+                      {row.status}
+                    </td>
+                    <td className="border p-2 text-black text-center">
+                      {row.nextPMDueDate}
+                    </td>
+                    <td className="border p-2 text-black text-center">
+                      {row.shotCount}
+                    </td>
                   </tr>
                 ))
               )}
@@ -234,8 +276,21 @@ const PMStatus = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weekWisePMPlan}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="week"  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }}/>
-                <YAxis  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }} />
+                <XAxis
+                  dataKey="week"
+                  tick={{
+                    fontSize: 15,
+                    fill: "#000",
+                    fontWeight: "bold",
+                  }}
+                />
+                <YAxis
+                  tick={{
+                    fontSize: 15,
+                    fill: "#000",
+                    fontWeight: "bold",
+                  }}
+                />
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="plan" fill="#82ca9d" />
@@ -244,35 +299,34 @@ const PMStatus = () => {
           )}
         </div>
 
-        {/* 3️⃣ PM in Plan Table (API: MouldWisePMPlan) */}
+        {/* 3️⃣ PM in Plan Table */}
         <div className="bg-blue-900 text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Table which will show the PM in Plan
         </div>
         <div
-  className="bg-white shadow-md rounded-lg mb-6"
-  style={{ maxHeight: "250px", overflowY: "auto" }}
->
-  <table className="w-full border border-collapse-separate">
-    <thead className="sticky top-0 z-30 bg-blue-700">
-      <tr>
-        <th className="border p-2 text-white text-center">Mould</th>
-        <th className="border p-2 text-white text-center">Plan Date</th>
-      </tr>
-    </thead>
+          className="bg-white shadow-md rounded-lg mb-6"
+          style={{ maxHeight: "250px", overflowY: "auto" }}
+        >
+          <table className="w-full border border-collapse-separate">
+            <thead className="sticky top-0 z-30 bg-blue-700">
+              <tr>
+                <th className="border p-2 text-white text-center">Mould</th>
+                <th className="border p-2 text-white text-center">Plan Date</th>
+              </tr>
+            </thead>
 
-    <tbody>
-      {pmPlanRows.map((row, i) => (
-        <tr key={i} className="bg-white text-black">
-          <td className="border p-2">{row.mould}</td>
-          <td className="border p-2">{row.planDate}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+            <tbody>
+              {pmPlanRows.map((row, i) => (
+                <tr key={i} className="bg-white text-black">
+                  <td className="border p-2 text-center">{row.mould}</td>
+                  <td className="border p-2 text-center">{row.planDate}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-
-        {/* 4️⃣ PM Due Date Table ASC (API: MouldWiseNextPMDuedate) */}
+        {/* 4️⃣ PM Due Date Table ASC */}
         <div className="bg-blue-900  text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Table which will show Next PM By Date
         </div>
@@ -281,8 +335,8 @@ const PMStatus = () => {
           style={{ maxHeight: "250px", overflowY: "auto" }}
         >
           <table className="w-full border border-collapse-separate">
-            <thead className="bg-blue-700 text-white sticky top-0 z-30" >
-              <tr >
+            <thead className="bg-blue-700 text-white sticky top-0 z-30">
+              <tr>
                 <th className="border p-2  text-center">Mould</th>
                 <th className="border p-2  text-center">Duration</th>
               </tr>
@@ -296,7 +350,10 @@ const PMStatus = () => {
                 </tr>
               ) : nextPmError ? (
                 <tr>
-                  <td colSpan={2} className="border p-2 text-center text-red-600">
+                  <td
+                    colSpan={2}
+                    className="border p-2 text-center text-red-600"
+                  >
                     {nextPmError}
                   </td>
                 </tr>
@@ -310,13 +367,16 @@ const PMStatus = () => {
                 nextPmRows
                   .slice()
                   .sort(
-                    (a, b) =>
-                      new Date(a.nextPMDate) - new Date(b.nextPMDate)
+                    (a, b) => new Date(a.nextPMDate) - new Date(b.nextPMDate)
                   )
                   .map((row, i) => (
                     <tr key={i}>
-                      <td className="border p-2 text-black text-center">{row.mould}</td>
-                      <td className="border p-2 text-black text-center">{row.nextPMDate}</td>
+                      <td className="border p-2 text-black text-center">
+                        {row.mould}
+                      </td>
+                      <td className="border p-2 text-black text-center">
+                        {row.nextPMDate}
+                      </td>
                     </tr>
                   ))
               )}
@@ -324,7 +384,7 @@ const PMStatus = () => {
           </table>
         </div>
 
-        {/* 5️⃣ Next 6 months chart */}
+        {/* 5️⃣ Next 6 months chart (NOW API-DRIVEN) */}
         <div className="bg-blue-900  text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Chart for showing next 6 months how many mould will come in PM
         </div>
@@ -332,19 +392,42 @@ const PMStatus = () => {
           className="bg-white shadow-md p-4 rounded-lg mb-6"
           style={{ height: 300 }}
         >
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={nextSixMonthData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month"  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }} />
-              <YAxis  tick={{ fontSize: 15, fill: "#000", fontWeight: "bold" }} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="count" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
+          {loadingNext6 ? (
+            <div className="w-full h-full flex items-center justify-center">
+              Loading chart...
+            </div>
+          ) : next6Error ? (
+            <div className="w-full h-full flex items-center justify-center text-red-600">
+              {next6Error}
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={next6MonthsPlan}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="month"
+                  tick={{
+                    fontSize: 15,
+                    fill: "#000",
+                    fontWeight: "bold",
+                  }}
+                />
+                <YAxis
+                  tick={{
+                    fontSize: 15,
+                    fill: "#000",
+                    fontWeight: "bold",
+                  }}
+                />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="count" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
-        {/* 6️⃣ Shot Count ASC (API: MouldWiseNextPMDueByShot) */}
+        {/* 6️⃣ Shot Count ASC */}
         <div className="bg-blue-900  text-center text-white px-8 py-5 rounded-md mb-2 text-medium font-bold block w-fit">
           Table which will show the PM by Shot Count
         </div>
@@ -354,7 +437,7 @@ const PMStatus = () => {
         >
           <table className="w-full border border-collapse-separate">
             <thead className="sticky top-0 z-30 bg-blue-700 text-white">
-              <tr >
+              <tr>
                 <th className="border p-2">Mould</th>
                 <th className="border p-2">Shot Count</th>
               </tr>
@@ -368,7 +451,10 @@ const PMStatus = () => {
                 </tr>
               ) : pmShotError ? (
                 <tr>
-                  <td colSpan={2} className="border p-2 text-center text-red-600">
+                  <td
+                    colSpan={2}
+                    className="border p-2 text-center text-red-600"
+                  >
                     {pmShotError}
                   </td>
                 </tr>
@@ -384,8 +470,12 @@ const PMStatus = () => {
                   .sort((a, b) => a.shotCount - b.shotCount)
                   .map((row, i) => (
                     <tr key={i}>
-                      <td className="border p-2 text-center text-black">{row.mould}</td>
-                      <td className="border p-2 text-center text-black">{row.shotCount}</td>
+                      <td className="border p-2 text-center text-black">
+                        {row.mould}
+                      </td>
+                      <td className="border p-2 text-center text-black">
+                        {row.shotCount}
+                      </td>
                     </tr>
                   ))
               )}
