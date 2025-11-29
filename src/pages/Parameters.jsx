@@ -5,10 +5,24 @@ import axios from "axios";
 import MachineSelector from "../partials/parameters/MachineParametersCard";
 import ParameterGroup from "../partials/parameters/ParameterGroup";
 
+const generateTimeSlots = (start, end) => {
+  const slots = [];
+  let current = new Date(`1970-01-01T${start}:00`);
+  const endTime = new Date(`1970-01-01T${end}:00`);
+
+  while (current <= endTime) {
+    const hh = current.getHours().toString().padStart(2, "0");
+    const mm = current.getMinutes().toString().padStart(2, "0");
+    slots.push(`${hh}:${mm}`);
+    current = new Date(current.getTime() + 30 * 60000); // +30 minutes
+  }
+  return slots;
+};
+
 const shiftHoursConst = {
-  A: [6, 7, 8, 9, 10, 11, 12, 13],
-  B: [14, 15, 16, 17, 18, 19, 20, 21],
-  C: [22, 23, 0, 1, 2, 3, 4, 5],
+  A: generateTimeSlots("07:00", "15:30"),
+  B: generateTimeSlots("15:30", "00:00"),
+  C: generateTimeSlots("00:00", "07:00"), // next day logic also works
 };
 
 const defaultData = [
@@ -199,13 +213,8 @@ export default function Parameters() {
   // compute time labels (hours) used by chart
   const timeLabels = useMemo(() => {
     if (filters.startTime && filters.endTime) {
-      const start = parseInt(filters.startTime.split(":")[0], 10);
-      const end = parseInt(filters.endTime.split(":")[0], 10);
-      const range = [];
-      // handle end smaller than start? assume same day and end >= start for simplicity
-      for (let i = start; i <= end; i++) range.push(i);
-      return range;
-    }
+  return generateTimeSlots(filters.startTime, filters.endTime);
+}
     return shiftHoursConst[filters.shift] || [];
   }, [filters.startTime, filters.endTime, filters.shift]);
 
