@@ -306,6 +306,35 @@ function Sidebar({
                 )}
               </SidebarLinkGroup>
 
+               {/* Parameters */}
+              <SidebarLinkGroup activecondition={pathname.includes("parameters")}>
+                {(handleClick, open) => (
+                    <NavLink
+                      end
+                      to="/parameters"
+                      className={({ isActive }) =>
+                        `block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
+                          isActive
+                            ? ""
+                            : "hover:text-gray-900 dark:hover:text-white"
+                        }`
+                      }
+                      onClick={() => {
+                        handleClick();
+                        setSidebarExpanded(true);
+                      }}
+                    >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <MdTune size={20} />
+                            <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+                              Parameters
+                            </span>
+                          </div>
+                        </div>
+                    </NavLink>
+                )}
+              </SidebarLinkGroup>
 
             </ul>
           </div>

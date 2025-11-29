@@ -13,6 +13,7 @@ import MouldSummary from "../pages/MouldSummary.jsx";
 import HCHistory from "../pages/MouldMaintenanceHistory/HCHistory.jsx";
 import MouldBreakdownHistory from "../pages/MouldMaintenanceHistory/BreakDownHistory.jsx";
 import SparePartHistory from "../pages/MouldMaintenanceHistory/SparePartHistory.jsx";
+import Parameters from "../pages/Parameters.jsx";
 
 export default function AppRoutes() {
   return (
@@ -72,7 +73,14 @@ export default function AppRoutes() {
           </PrivateRoute>
         }
       />
-
+ <Route
+        path="/parameters"
+        element={
+          <PrivateRoute>
+            <Parameters />
+          </PrivateRoute>
+        }
+      />
       <Route
         path="/HCHistory"
         element={
