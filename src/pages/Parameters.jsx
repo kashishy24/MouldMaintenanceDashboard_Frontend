@@ -55,6 +55,18 @@ const defaultData = [
           { label: "Dosing Back Pressure Step 3",  active: false },
         ],
       },
+         {
+        name: "Switch Over Pressure",
+        steps: [
+          { label: "Switch Over Pressure", active: false }
+        ],
+      },
+       {
+        name: "Peak Injection Pressure",
+        steps: [
+          { label: "Peak Injection Pressure", active: false }
+        ],
+      },
     ],
   },
   {
@@ -96,23 +108,59 @@ const defaultData = [
       },
       {
         name: "Oil Temperature",
-        steps: [{ label: "Oil Temperature Actual", value: 45, active: false }],
+        steps: [{ label: "Oil Temperature Actual", active: false }],
       },
       {
         name: "Hot Runner Temperature",
         steps: [
-          { label: "Hot Runner Zone 1",  active: false },
-          { label: "Hot Runner Zone 2", active: false },
-          { label: "Hot Runner Zone 3",  active: false },
-          { label: "Hot Runner Zone 4", active: false },
-          { label: "Hot Runner Zone 5",  active: false },
-          { label: "Hot Runner Zone 6",  active: false },
-          { label: "Hot Runner Zone 7",  active: false },
-          { label: "Hot Runner Zone 8", active: false },
-          { label: "Hot Runner Zone 9",active: false },
-          { label: "Hot Runner Zone 10", active: false },
-          { label: "Hot Runner Zone 11",  active: false },
-          { label: "Hot Runner Zone 12",  active: false },
+          { label: "Hot runner temperature actual zone 1",  active: false },
+          { label: "Hot runner temperature actual zone 2", active: false },
+          { label: "Hot runner temperature actual zone 3",  active: false },
+          { label: "Hot runner temperature actual zone 4", active: false },
+          { label: "Hot runner temperature actual zone 5",  active: false },
+          { label: "Hot runner temperature actual zone 6",  active: false },
+          { label: "Hot runner temperature actual zone 7",  active: false },
+          { label: "Hot runner temperature actual zone 8", active: false },
+          { label: "Hot runner temperature actual zone 9",active: false },
+          { label: "Hot runner temperature actual zone 10", active: false },
+          { label: "Hot runner temperature actual zone 11",  active: false },
+          { label: "Hot runner temperature actual zone 12",  active: false },
+        ],
+      },
+          {
+        name: "Zone Temperature",
+        steps: [{ label: "Zone 1 Temeprature",  active: false },
+          { label: "Zone 2 Temeprature",  active: false },
+          { label: "Zone 3 Temeprature",  active: false },
+          { label: "Zone 4 Temeprature",  active: false },
+        ],
+      },
+       {
+        name: "Nozzle Temeprature",
+        steps: [{ label: "Nozzle 1 Temeprature",  active: false },
+          { label: "Nozzle 2 Temeprature",  active: false },
+        ],
+      },
+
+      {
+        name: "Feed Temperature",
+        steps: [{ label: "Feed Temperature",  active: false }
+        ],
+      },
+       {
+        name: "Melt Temperature",
+        steps: [{ label: "Melt Temperature",  active: false }
+        ],
+      },
+       {
+        name: "Mold Zone Temperature",
+        steps: [{ label: "Mold Zone1 Temperature",  active: false },
+          { label: "Mold Zone2 Temperature",  active: false }
+        ],
+      },
+      {
+        name: "MTC",
+        steps: [{ label: "MTC Temperature",  active: false }
         ],
       },
     ],
@@ -123,14 +171,14 @@ const defaultData = [
       {
         name: "Cascade Injection Delay Time",
         steps: [
-          { label: "Delay Time 1", active: false },
-          { label: "Delay Time 2",  active: false },
-          { label: "Delay Time 3",  active: false },
-          { label: "Delay Time 4",  active: false },
-          { label: "Delay Time 5",  active: false },
-          { label: "Delay Time 6",  active: false },
-          { label: "Delay Time 7", active: false },
-          { label: "Delay Time 8",  active: false },
+          { label: "Cascade injection delay time 1", active: false },
+          { label: "Cascade injection delay time 2",  active: false },
+          { label: "Cascade injection delay time 3",  active: false },
+          { label: "Cascade injection delay time 4",  active: false },
+          { label: "Cascade injection delay time 5",  active: false },
+          { label: "Cascade injection delay time 6",  active: false },
+          { label: "Cascade injection delay time 7", active: false },
+          { label: "Cascade injection delay time 8",  active: false },
         ],
       },
       {
@@ -139,6 +187,7 @@ const defaultData = [
           { label: "Holding Time Step 1", active: false },
           { label: "Holding Time Step 2",  active: false },
           { label: "Holding Time Step 3",  active: false },
+          { label: "Holding Time Step 4",  active: false },
         ],
       },
       {
@@ -147,11 +196,24 @@ const defaultData = [
       },
       {
         name: "Cooling Time",
-        steps: [{ label: "Cooling Time",  active: false }],
+        steps: [{ label: "Cooling Time Actual",  active: false }],
       },
       {
         name: "Dosing Time",
-        steps: [{ label: "Dosing Time",  active: false }],
+        steps: [{ label: "Dosing Time",  active: false },
+          { label: "Dosing Time Actual",  active: false }
+        ],
+      },
+      {
+        name: "Cycle Time",
+        steps: [{ label: "Cycle Time",  active: false }
+        ],
+      },
+        {
+        name: "Mold",
+        steps: [{ label: "Mold Open Time",  active: false },
+          { label: "Mold Close Time",  active: false }
+        ],
       },
     ],
   },
@@ -165,6 +227,23 @@ const defaultData = [
           { label: "Injection Position for Speed 2",  active: false },
           { label: "Injection Position for Speed 3",  active: false },
           { label: "Injection Position for Speed 4",  active: false },
+            { label: "Injection Start Position",  active: false },
+              { label: "Switch Over Position",  active: false },
+        ],
+      },
+    ],
+  },
+
+  {
+    group: "Common",
+    subParameters: [
+      {
+        name: "Common ",
+        steps: [
+          { label: "Shot Count", active: false },
+          { label: "Tonnage",  active: false },
+          { label: "Mold Open Stop",  active: false },
+          { label: "Melt Cushion",  active: false },
         ],
       },
     ],

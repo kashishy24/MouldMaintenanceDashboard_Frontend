@@ -328,10 +328,10 @@ export default function SparePartUI() {
             </select>
 
             <div className="ml-4 text-sm text-gray-600">
-              ID:{" "}
-              <span className="font-semibold">
+              {/* ID:{" "} */}
+              {/* <span className="font-semibold">
                 {selectedCategoryID ?? "—"}
-              </span>
+              </span> */}
             </div>
           </div>
         </div>
