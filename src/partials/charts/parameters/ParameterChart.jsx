@@ -22,12 +22,34 @@ const COLORS = [
   "#06B6D4",
 ];
 
+/* ===============================
+   ✅ CUSTOM TOOLTIP WITH UNIT
+================================ */
+const CustomTooltip = ({ active, payload, label, apiData }) => {
+  if (!active || !payload || payload.length === 0) return null;
+
+  return (
+    <div className="bg-white p-2 border rounded shadow text-sm">
+      <div className="font-semibold mb-1">{label}</div>
+
+      {payload.map((item, idx) => {
+        const unit = apiData[item.name]?.unit || "";
+        return (
+          <div key={idx} style={{ color: item.stroke }}>
+            {item.name} : {item.value}
+            {unit && ` ${unit}`}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 export default function ParameterChart({
   parameterData = [],
   timeLabels = [],
   apiData = {},
 }) {
-  // No selected parameters
   if (!Array.isArray(parameterData) || parameterData.length === 0) {
     return (
       <p className="text-gray-500 text-sm text-center">
@@ -36,7 +58,6 @@ export default function ParameterChart({
     );
   }
 
-  // Extract only the parameters that exist in backend response
   const backendKeys = parameterData
     .map((p) => p.label)
     .filter((label) => apiData && apiData[label]);
@@ -44,18 +65,14 @@ export default function ParameterChart({
   let chartData = [];
   let finalLabels = [];
 
-  // -------------------------------
-  // CASE 1: BACKEND TREND DATA EXISTS
-  // -------------------------------
+  // ===============================
+  // CASE 1: BACKEND DATA EXISTS
+  // ===============================
   if (backendKeys.length > 0) {
     const timeSet = new Set();
 
     backendKeys.forEach((label) => {
-      const entry = apiData[label];
-
-      if (entry && Array.isArray(entry.labels)) {
-        entry.labels.forEach((t) => timeSet.add(t));
-      }
+      apiData[label]?.labels?.forEach((t) => timeSet.add(t));
     });
 
     finalLabels = Array.from(timeSet).sort();
@@ -65,16 +82,10 @@ export default function ParameterChart({
 
       backendKeys.forEach((label) => {
         const entry = apiData[label];
-
-        if (!entry || !Array.isArray(entry.labels)) {
-          row[label] = null;
-          return;
-        }
-
-        const index = entry.labels.indexOf(time);
+        const idx = entry?.labels?.indexOf(time);
         row[label] =
-          index >= 0 && entry.values && entry.values[index] != null
-            ? entry.values[index]
+          idx >= 0 && entry?.values?.[idx] != null
+            ? entry.values[idx]
             : null;
       });
 
@@ -82,37 +93,20 @@ export default function ParameterChart({
     });
   }
 
-  // -----------------------------------------------
-  // CASE 2: NO BACKEND TREND DATA → FALLBACK TO LOCAL
-  // -----------------------------------------------
+  // ===============================
+  // CASE 2: FALLBACK
+  // ===============================
   else {
     const labels =
       Array.isArray(timeLabels) && timeLabels.length > 0
         ? timeLabels.map((h) => `${String(h).padStart(2, "0")}:00:00`)
-        : Array.from(
-            {
-              length:
-                parameterData[0]?.values?.length > 0
-                  ? parameterData[0].values.length
-                  : 12,
-            },
-            (_, i) => `T${i + 1}`
-          );
+        : Array.from({ length: 12 }, (_, i) => `T${i + 1}`);
 
     chartData = labels.map((lbl, idx) => {
       const row = { time: lbl };
-
       parameterData.forEach((p) => {
-        if (!p || !Array.isArray(p.values)) {
-          row[p.label] = null;
-        } else {
-          row[p.label] =
-            p.values[idx] !== undefined && p.values[idx] !== null
-              ? p.values[idx]
-              : null;
-        }
+        row[p.label] = p.values?.[idx] ?? null;
       });
-
       return row;
     });
   }
@@ -126,7 +120,10 @@ export default function ParameterChart({
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="time" tick={{ fontSize: 11 }} />
           <YAxis />
-          <Tooltip />
+
+          {/* ✅ TOOLTIP WITH UNIT */}
+          <Tooltip content={<CustomTooltip apiData={apiData} />} />
+
           <Legend />
 
           {seriesLabels.map((lbl, idx) => (

@@ -299,20 +299,25 @@ export default function Parameters() {
 
   // Helper: build time-based values array for each parameter from API rows
   // rows: [{ParamName, ParameterValue, Timestamp}, ...]
- const buildApiSeries = (rows = []) => {
+
+const buildApiSeries = (rows = []) => {
   const grouped = {};
 
   rows.forEach((r) => {
-    if (!grouped[r.ParamName]) grouped[r.ParamName] = [];
-
+    if (!grouped[r.ParamName]) {
+      grouped[r.ParamName] = {
+        unit: r.Unit || "",
+        points: [],
+      };
+    }
 
     const ts = new Date(r.Timestamp);
-const label =
-  ts.getUTCHours().toString().padStart(2, "0") + ":" +
-  ts.getUTCMinutes().toString().padStart(2, "0") + ":" +
-  ts.getUTCSeconds().toString().padStart(2, "0");
+    const label =
+      ts.getUTCHours().toString().padStart(2, "0") + ":" +
+      ts.getUTCMinutes().toString().padStart(2, "0") + ":" +
+      ts.getUTCSeconds().toString().padStart(2, "0");
 
-    grouped[r.ParamName].push({
+    grouped[r.ParamName].points.push({
       timeLabel: label,
       value: Number(r.ParameterValue),
     });
@@ -321,16 +326,17 @@ const label =
   const out = {};
 
   Object.keys(grouped).forEach((param) => {
-    // sorted by timestamp
-    const sorted = grouped[param].sort(
-  (a, b) =>
-    new Date(`1970-01-01T${a.timeLabel}Z`) -
-    new Date(`1970-01-01T${b.timeLabel}Z`)
-);
+    // ✅ SORT POINTS (NOT THE OBJECT)
+    const sorted = grouped[param].points.sort(
+      (a, b) =>
+        new Date(`1970-01-01T${a.timeLabel}Z`) -
+        new Date(`1970-01-01T${b.timeLabel}Z`)
+    );
 
     out[param] = {
       labels: sorted.map((x) => x.timeLabel),
       values: sorted.map((x) => x.value),
+      unit: grouped[param].unit, // ✅ UNIT PRESERVED
     };
   });
 
