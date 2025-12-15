@@ -301,7 +301,7 @@ export default function Home() {
         // normalize for the Spare Part Consumption table
         const formatted = (Array.isArray(rows) ? rows : []).map((r) => ({
           mouldname: r.MouldName ?? "-",           // best-effort mapping
-          category: r.SparePartCategoryName ?? r.Category ?? "-",
+          category: r.category ?? "-",
           partName: r.SparePartName ?? r.PartName ?? "-",
           availableQty: Number.isFinite(Number(r.CurrentQuantity)) ? Number(r.CurrentQuantity) : (r.AvailableQty ?? "-"),
           usedQty: r.UsedQty ?? r.UsedQuantity ?? "-", // if backend provides used qty use it, otherwise leave '-'

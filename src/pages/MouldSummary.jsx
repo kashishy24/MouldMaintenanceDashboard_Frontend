@@ -214,13 +214,19 @@ const MouldSummary = () => {
               setBreakdownOccurrence(parsedOcc);
 
               // Parse SpareParts API
-              let spareRows = spareRes.data?.data ?? [];
+              // let spareRows = spareRes.data?.data ?? [];
+              // const parsedSpare = (Array.isArray(spareRows) ? spareRows : []).map((s) => ({
+              //   name: s.SparePartName || s.PartName || `Part-${s.SparePartID ?? "?"}`,
+              //   qty: Number(s.TotalQuantityUsed ?? s.Quantity ?? s.TotalUsed ?? 0),
+              // }));
+              // setSpareParts(parsedSpare);
+let spareRows = spareRes.data?.data ?? [];
               const parsedSpare = (Array.isArray(spareRows) ? spareRows : []).map((s) => ({
-                name: s.SparePartName || s.PartName || `Part-${s.SparePartID ?? "?"}`,
-                qty: Number(s.TotalQuantityUsed ?? s.Quantity ?? s.TotalUsed ?? 0),
-              }));
-              setSpareParts(parsedSpare);
-
+  id: s.SparePartID ?? null,
+  name: s.SparePartName ?? `Part-${s.SparePartID ?? "?"}`,
+  qty: Number(s.TotalQuantityUsed ?? 0),
+}));
+setSpareParts(parsedSpare);
               // Parse PM OnTime API
               const pmRows = pmOnRes.data?.data ?? [];
               const groupedPm = groupOnTimeRows(pmRows);
