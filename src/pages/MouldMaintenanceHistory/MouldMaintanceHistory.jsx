@@ -259,8 +259,6 @@ export default function MouldMaintenanceHistory() {
   return (
     <DashboardLayout>
       <div className="p-6 w-full text-gray-800">
-          {/* TITLE */}
-        <h2 className="text-center text-3xl font-bold mb-6 text-gray-900 tracking-wide"> Preventive Maintenance History</h2>
         {/* TOP FILTER + BUTTONS */}
         <div className="flex flex-wrap items-center justify-between bg-white p-4 rounded-xl shadow mb-6">
           <div className="flex gap-3 flex-wrap">

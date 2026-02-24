@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
-
-// import SearchModal from '../components/ModalSearch';
-// import Notifications from '../components/DropdownNotifications';
-// import Help from '../components/DropdownHelp';
+import React, { useState, useEffect } from 'react';
+import { useLocation, Link } from 'react-router-dom';
+import { MdDashboard, MdHistory, MdBuild, MdHealthAndSafety, MdInventory, MdSettings, MdReport, MdChevronRight, MdSearch, MdNotifications, MdPerson } from 'react-icons/md';
 import UserMenu from '../components/DropdownProfile';
 import ThemeToggle from '../components/ThemeToggle';
 
@@ -11,70 +9,143 @@ function Header({
   setSidebarOpen,
   variant = 'default',
 }) {
+  const location = useLocation();
+  const { pathname } = location;
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // const [searchModalOpen, setSearchModalOpen] = useState(false)
+  // Update time every minute
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Route name mapping with icons
+  const routeConfig = {
+    '/Home': { name: 'Home', icon: MdDashboard, color: 'text-blue-600' },
+    '/MouldMaintenanceHistory': { name: 'Preventive Maintenance History', icon: MdHistory, color: 'text-violet-600' },
+    '/PMStatus': { name: 'PM Status', icon: MdBuild, color: 'text-orange-600' },
+    '/HCStatus': { name: 'Health Check Status', icon: MdHealthAndSafety, color: 'text-green-600' },
+    '/SparePart': { name: 'Spare Part', icon: MdInventory, color: 'text-yellow-600' },
+    '/MouldSummary': { name: 'Mould Summary', icon: MdDashboard, color: 'text-indigo-600' },
+    '/parameters': { name: 'Parameters', icon: MdSettings, color: 'text-gray-600' },
+    '/HCHistory': { name: 'Health Check History', icon: MdHistory, color: 'text-green-600' },
+    '/MouldBreakdownHistory': { name: 'Mould Breakdown History', icon: MdHistory, color: 'text-red-600' },
+    '/SparePartHistory': { name: 'Spare Part History', icon: MdInventory, color: 'text-yellow-600' },
+    '/PMCheckPointReport': { name: 'PM CheckPoint Report', icon: MdReport, color: 'text-blue-600' },
+  };
+
+  const currentRoute = routeConfig[pathname] || { name: 'Dashboard', icon: MdDashboard, color: 'text-blue-600' };
+  const CurrentIcon = currentRoute.icon;
+
+  // Format date
+  const formattedDate = currentTime.toLocaleDateString('en-US', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+  const formattedTime = currentTime.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  // Get greeting based on time
+  const getGreeting = () => {
+    const hour = currentTime.getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  };
 
   return (
-    <header className={`sticky top-0 before:absolute before:inset-0 before:backdrop-blur-md max-lg:before:bg-white/90 dark:max-lg:before:bg-gray-800/90 before:-z-10 z-30 ${variant === 'v2' || variant === 'v3' ? 'before:bg-white after:absolute after:h-px after:inset-x-0 after:top-full after:bg-gray-200 dark:after:bg-gray-700/60 after:-z-10' : 'max-lg:shadow-xs lg:before:bg-gray-100/90 dark:lg:before:bg-gray-900/90'} ${variant === 'v2' ? 'dark:before:bg-gray-800' : ''} ${variant === 'v3' ? 'dark:before:bg-gray-900' : ''}`}>
+    <header className={`sticky top-0 z-40 transition-all duration-300 ${
+      variant === 'v2' || variant === 'v3' 
+        ? 'bg-white dark:bg-gray-800 shadow-sm' 
+        : 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm'
+    }`}>
       <div className="px-4 sm:px-6 lg:px-8">
-        <div className={`flex items-center justify-between h-16 ${variant === 'v2' || variant === 'v3' ? '' : 'lg:border-b border-gray-200 dark:border-gray-700/60'}`}>
-
-          {/* Header: Left side */}
-          <div className="flex">
-
+        <div className="flex items-center justify-between h-20">
+          
+          {/* Left Section */}
+          <div className="flex items-center gap-4">
             {/* Hamburger button */}
             <button
-              className="text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 lg:hidden"
+              className="lg:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-gray-800 transition-all duration-200"
               aria-controls="sidebar"
               aria-expanded={sidebarOpen}
               onClick={(e) => { e.stopPropagation(); setSidebarOpen(!sidebarOpen); }}
             >
               <span className="sr-only">Open sidebar</span>
-              <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <rect x="4" y="5" width="16" height="2" />
-                <rect x="4" y="11" width="16" height="2" />
-                <rect x="4" y="17" width="16" height="2" />
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
 
-            {/* Left: Title */}
-            <div className="mb-4 sm:mb-0">
-              <h1 className="hidden lg:block text-2xl text-gray-800 dark:text-gray-100 font-bold ">Dashboard</h1>
+            {/* Breadcrumb & Page Title */}
+            <div className="flex flex-col">
+              {/* Breadcrumb */}
+              {/* <nav className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 mb-1">
+                <Link to="/home" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  Home
+                </Link>
+                <MdChevronRight className="text-gray-400" />
+                <span className="text-gray-800 dark:text-gray-200 font-medium">{currentRoute.name}</span>
+              </nav> */}
+              
+              {/* Page Title with Icon */}
+              <div className="flex items-center gap-2">
+                <CurrentIcon className={`w-6 h-6 ${currentRoute.color}`} />
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">
+                  {currentRoute.name}
+                </h1>
+              </div>
             </div>
-
           </div>
 
-          {/* Header: Right side */}
-          <div className="flex items-center space-x-3">
-            <div>
-              {/* <button
-                className={`w-8 h-8 flex items-center justify-center hover:bg-gray-100 lg:hover:bg-gray-200 dark:hover:bg-gray-700/50 dark:lg:hover:bg-gray-800 rounded-full ml-3 ${searchModalOpen && 'bg-gray-200 dark:bg-gray-800'}`}
-                onClick={(e) => { e.stopPropagation(); setSearchModalOpen(true); }}
-                aria-controls="search-modal"
-              >
-                <span className="sr-only">Search</span>
-                <svg
-                  className="fill-current text-gray-500/80 dark:text-gray-400/80"
-                  width={16}
-                  height={16}
-                  viewBox="0 0 16 16"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M7 14c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7ZM7 2C4.243 2 2 4.243 2 7s2.243 5 5 5 5-2.243 5-5-2.243-5-5-5Z" />
-                  <path d="m13.314 11.9 2.393 2.393a.999.999 0 1 1-1.414 1.414L11.9 13.314a8.019 8.019 0 0 0 1.414-1.414Z" />
-                </svg>
-              </button>
-              <SearchModal id="search-modal" searchId="search" modalOpen={searchModalOpen} setModalOpen={setSearchModalOpen} /> */}
+          {/* Right Section */}
+          <div className="flex items-center gap-2 sm:gap-4">
+            
+            {/* Search Bar */}
+            {/* <div className="hidden md:flex items-center relative">
+              <div className="relative group">
+                <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 pr-4 py-2 w-48 lg:w-64 rounded-full bg-gray-100 dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-gray-700 transition-all duration-200"
+                />
+              </div>
+            </div> */}
+
+            {/* Date & Time */}
+            <div className="hidden lg:flex flex-col items-end text-sm text-gray-600 dark:text-gray-300 mr-2">
+              <span className="font-semibold">{formattedTime}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">{formattedDate}</span>
             </div>
-            {/* <Notifications align="right" />
-            <Help align="right" /> */}
+
+            {/* Divider */}
+            <div className="hidden sm:block h-8 w-px bg-gray-200 dark:bg-gray-700"></div>
+
+            {/* Theme Toggle */}
             <ThemeToggle />
-            {/*  Divider */}
-            <hr className="w-px h-6 bg-gray-200 dark:bg-gray-700/60 border-none" />
-            <UserMenu align="right" />
 
+            {/* Notifications */}
+            {/* <button className="relative p-2 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-gray-800 transition-all duration-200">
+              <MdNotifications className="w-5 h-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button> */}
+
+            {/* Divider */}
+            <div className="hidden sm:block h-8 w-px bg-gray-200 dark:bg-gray-700"></div>
+
+            {/* User Menu */}
+            <div className="flex items-center gap-2">
+              <UserMenu align="right" />
+            </div>
           </div>
-
         </div>
       </div>
     </header>

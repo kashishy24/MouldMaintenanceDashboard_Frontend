@@ -256,7 +256,6 @@ const HCHistory = () => {
   return (
     <DashboardLayout>
       <div className="p-6 w-full text-gray-800">
-           <h2 className="text-center text-3xl font-bold mb-6 text-gray-900 tracking-wide"> Health Check History</h2>
         {/* TOP SECTION */}
         <div className="flex flex-wrap items-center justify-between bg-white p-4 rounded-xl shadow mb-6">
           {/* BUTTONS */}

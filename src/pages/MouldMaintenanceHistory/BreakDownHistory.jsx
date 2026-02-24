@@ -279,7 +279,6 @@ const BreakDownHistory = () => {
   return (
     <DashboardLayout>
       <div className="p-4 w-full">
-          <h2 className="text-center text-3xl font-bold mb-6 text-gray-900 tracking-wide"> Breakdown History</h2>
         {/* ---------------------- FILTER BAR ---------------------- */}
         <div className="flex flex-wrap items-center justify-between bg-white p-4 rounded-xl shadow mb-6">
           <div className="flex gap-3 flex-wrap">
