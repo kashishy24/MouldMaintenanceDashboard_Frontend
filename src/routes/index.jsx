@@ -14,6 +14,7 @@ import HCHistory from "../pages/MouldMaintenanceHistory/HCHistory.jsx";
 import MouldBreakdownHistory from "../pages/MouldMaintenanceHistory/BreakDownHistory.jsx";
 import SparePartHistory from "../pages/MouldMaintenanceHistory/SparePartHistory.jsx";
 import Parameters from "../pages/Parameters.jsx";
+import PMCheckPointReport from "../pages/MouldMaintenanceHistory/PMCheckPointReport.jsx";
 
 export default function AppRoutes() {
   return (
@@ -104,6 +105,15 @@ export default function AppRoutes() {
         element={
           <PrivateRoute>
             <SparePartHistory />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/PMCheckPointReport"
+        element={
+          <PrivateRoute>
+            <PMCheckPointReport />
           </PrivateRoute>
         }
       />

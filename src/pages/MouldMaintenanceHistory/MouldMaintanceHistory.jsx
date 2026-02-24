@@ -361,6 +361,7 @@ export default function MouldMaintenanceHistory() {
                       <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">At Mould Life</th>
                       <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Start Time</th>
                       <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Remark</th>
+                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Action</th>
                     </tr>
                   </thead>
 
@@ -382,6 +383,15 @@ export default function MouldMaintenanceHistory() {
                           <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.atMouldLife ?? "-"}</td>
                           <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{formatFriendlyDate(row.startTime)}</td>
                           <td className="p-3 border text-left whitespace-nowrap text-center font-medium text-black">{row.remark || "-"}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">
+                            {/* Action button - navigates to PMCheckPointReport with parameters */}
+                            <button
+                              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                              onClick={() => navigate(`/PMCheckPointReport?checkListName=${encodeURIComponent(row.checkListName)}&mouldName=${encodeURIComponent(row.mouldName)}&instance=${encodeURIComponent(row.instance)}`)}
+                            >
+                              View Report
+                            </button>
+                              </td>
                         </tr>
                       ))
                     )}
