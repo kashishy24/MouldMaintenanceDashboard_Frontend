@@ -176,7 +176,7 @@ useEffect(() => {
       <div className="px-4 py-4 bg-gray-100 min-h-screen">
         <div className="w-full mx-auto space-y-4">
           {/* ===== MODERN INFO GRID ===== */}
-<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
 
   <InfoCard label="Mould Name" value={mouldName} />
   <InfoCard label="Part Name" value="ABC" />
@@ -200,7 +200,8 @@ useEffect(() => {
                 border rounded-2xl shadow-md p-4 flex flex-wrap 
                 justify-between items-center gap-3">
 
-  <h2 className="text-lg font-semibold text-gray-700">
+  <h2 className="text-lg font-bold text-black  ">
+    Check Point Details 
   </h2>
 
   <div className="flex gap-3 flex-wrap">
@@ -241,11 +242,8 @@ useEffect(() => {
 
           {/* ===== CHECKPOINT TABLE ===== */}
           <div className="bg-white rounded-2xl shadow-lg border">
-  <div className="bg-blue-700 text-white px-6 py-4">
-    <h2 className="text-lg font-semibold text-center">
-      Checkpoint Details
-    </h2>
-  </div>
+  {/* <div className="bg-blue-700 text-white px-6 py-4">
+  </div> */}
 
   <div className="max-h-[500px] overflow-auto">
     <table className="min-w-[1500px] w-full text-sm">
