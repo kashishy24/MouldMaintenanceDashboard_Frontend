@@ -181,6 +181,8 @@ export default function MouldMaintenanceHistory() {
       // Map fields as required for the table
       const mapped = (rows || []).map((r, idx) => ({
         key: idx,
+        checkListID: r.CheckListID,
+        userName: r.UserName ?? "",
         checkListName: r.CheckListName ?? "",
         mouldName: r.MouldName ?? "",
         materialName: r.MaterialName ?? "",
@@ -287,11 +289,11 @@ export default function MouldMaintenanceHistory() {
           </div>
         </div>
 
-      
+
 
         {/* CHART */}
         <div className="w-full h-80 bg-white rounded-xl shadow-md p-8 mb-6">
-            <h3 className="font-semibold text-center mb-2 text-black">PM Plan Vs Actual</h3>
+          <h3 className="font-semibold text-center mb-2 text-black">PM Plan Vs Actual</h3>
           {loadingChart ? (
             <div className="flex items-center justify-center h-full">Loading chart...</div>
           ) : chartError ? (
@@ -300,8 +302,8 @@ export default function MouldMaintenanceHistory() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" tick={{ fontSize: 12 ,fill: "#000000ff",fontWeight: "bold"}} />
-                <YAxis tick={{ fontSize: 12 ,fill: "#000000ff",fontWeight: "bold"}}/>
+                <XAxis dataKey="date" tick={{ fontSize: 12, fill: "#000000ff", fontWeight: "bold" }} />
+                <YAxis tick={{ fontSize: 12, fill: "#000000ff", fontWeight: "bold" }} />
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="plan" fill="#1E3A8A" radius={[4, 4, 0, 0]} name="Plan" />
@@ -375,7 +377,7 @@ export default function MouldMaintenanceHistory() {
                           <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.instance}</td>
                           <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.mouldName}</td>
                           <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.materialName}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.userId}</td>
+                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.userName}</td>
                           <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.pmStatus}</td>
                           <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.pmDuration}</td>
                           <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.atMouldLife ?? "-"}</td>
@@ -385,11 +387,20 @@ export default function MouldMaintenanceHistory() {
                             {/* Action button - navigates to PMCheckPointReport with parameters */}
                             <button
                               className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                              onClick={() => navigate(`/PMCheckPointReport?checkListName=${encodeURIComponent(row.checkListName)}&mouldName=${encodeURIComponent(row.mouldName)}&instance=${encodeURIComponent(row.instance)}`)}
+                              onClick={() =>
+                                navigate(
+                                  `/PMCheckPointReport?checkListID=${row.checkListID}
+&instance=${row.instance}
+&mouldName=${encodeURIComponent(row.mouldName)}
+&materialName=${encodeURIComponent(row.materialName)}
+&atMouldLife=${row.atMouldLife}
+&userName=${encodeURIComponent(row.userName)}`
+                                )
+                              }
                             >
                               View Report
                             </button>
-                              </td>
+                          </td>
                         </tr>
                       ))
                     )}
