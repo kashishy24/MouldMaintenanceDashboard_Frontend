@@ -33,6 +33,7 @@ function Header({
     '/MouldBreakdownHistory': { name: 'Mould Breakdown History', icon: MdHistory, color: 'text-red-600' },
     '/SparePartHistory': { name: 'Spare Part History', icon: MdInventory, color: 'text-yellow-600' },
     '/PMCheckPointReport': { name: 'PM CheckPoint Report', icon: MdReport, color: 'text-blue-600' },
+    '/HCCheckPointReport': { name: 'HC CheckPoint Report', icon: MdReport, color: 'text-green-600' },
   };
 
   const currentRoute = routeConfig[pathname] || { name: 'Dashboard', icon: MdDashboard, color: 'text-blue-600' };

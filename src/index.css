@@ -1,0 +1,32 @@
+@media print {
+
+  body {
+    background: white !important;
+  }
+
+  button {
+    display: none !important;
+  }
+
+  .sticky {
+    position: static !important;
+  }
+
+  .max-h-\[500px\] {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  table {
+    width: 100% !important;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+}

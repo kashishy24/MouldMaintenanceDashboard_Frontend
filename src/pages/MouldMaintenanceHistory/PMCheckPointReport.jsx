@@ -115,30 +115,15 @@ export default function PMCheckPointReport() {
 
   // ================= PRINT =================
   const handlePrint = () => {
-    const printContent = printRef.current;
-    const WinPrint = window.open("", "", "width=1200,height=800");
-    WinPrint.document.write(`
-      <html>
-        <head>
-          <title>PM Report</title>
-          <style>
-            body { font-family: Arial; padding: 20px; }
-            table { width: 100%; border-collapse: collapse; }
-            th, td { border: 1px solid #000; padding: 6px; font-size: 10px; }
-            th { background: #1f2937; color: white; }
-            tr { page-break-inside: avoid; }
-          </style>
-        </head>
-        <body>
-          ${printContent.innerHTML}
-        </body>
-      </html>
-    `);
-    WinPrint.document.close();
-    WinPrint.focus();
-    WinPrint.print();
-    WinPrint.close();
-  };
+  const printContents = printRef.current.innerHTML;
+  const originalContents = document.body.innerHTML;
+
+  document.body.innerHTML = printContents;
+  window.print();
+  document.body.innerHTML = originalContents;
+
+  window.location.reload(); // reload to restore React state
+};
 
   // ================= EXCEL =================
   const exportToExcel = () => {
@@ -296,7 +281,7 @@ export default function PMCheckPointReport() {
   return (
     <DashboardLayout>
       <div className="px-4 py-4 bg-gray-100 min-h-screen">
-        <div className="w-full mx-auto space-y-4">
+        <div className="w-full mx-auto space-y-4" ref={printRef}>
           {/* ===== MODERN INFO GRID ===== */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
 

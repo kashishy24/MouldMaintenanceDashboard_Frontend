@@ -5,6 +5,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import rootReducer from "./reducer";
 import ThemeProvider from './utils/ThemeContext';
 import { Toaster } from "react-hot-toast";
+import "./index.css";
 import App from './App';
 
 const store = configureStore({
