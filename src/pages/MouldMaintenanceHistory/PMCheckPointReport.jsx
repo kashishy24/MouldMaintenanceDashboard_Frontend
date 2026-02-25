@@ -114,16 +114,99 @@ export default function PMCheckPointReport() {
   // };
 
   // ================= PRINT =================
-  const handlePrint = () => {
-  const printContents = printRef.current.innerHTML;
-  const originalContents = document.body.innerHTML;
-
-  document.body.innerHTML = printContents;
-  window.print();
-  document.body.innerHTML = originalContents;
-
-  window.location.reload(); // reload to restore React state
+ const handlePrint = () => {
+  const printContent = printRef.current.innerHTML;
+ 
+  const WinPrint = window.open("", "", "width=1200,height=800");
+ 
+  WinPrint.document.write(`
+    <html>
+      <head>
+        <title>HC Report</title>
+        <style>
+          @page {
+            size: A4 landscape;
+            margin: 8mm;
+          }
+ 
+          body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+          }
+ 
+          /* ===== INFO CARD GRID ===== */
+          .grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+          }
+ 
+          .grid > div {
+            border: 1px solid #ccc;
+            padding: 8px;
+            border-radius: 6px;
+            page-break-inside: avoid;
+          }
+ 
+          .grid p:first-child {
+            font-size: 10px;
+            color: #555;
+            text-transform: uppercase;
+            margin: 0;
+          }
+ 
+          .grid p:last-child {
+            font-size: 12px;
+            font-weight: bold;
+            margin: 4px 0 0 0;
+          }
+ 
+          /* ===== HIDE BUTTONS ===== */
+          button {
+            display: none !important;
+          }
+ 
+          /* ===== TABLE ===== */
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8px;
+          }
+ 
+          th, td {
+            border: 1px solid #000;
+            padding: 6px;
+            text-align: center;
+          }
+ 
+          th {
+            background: #1f2937;
+            color: white;
+          }
+ 
+          thead {
+            display: table-header-group;
+          }
+ 
+          tr {
+            page-break-inside: avoid;
+          }
+ 
+        </style>
+      </head>
+      <body>
+        ${printContent}
+      </body>
+    </html>
+  `);
+ 
+  WinPrint.document.close();
+  WinPrint.focus();
+  WinPrint.print();
+  WinPrint.close();
 };
+ 
 
   // ================= EXCEL =================
   const exportToExcel = () => {

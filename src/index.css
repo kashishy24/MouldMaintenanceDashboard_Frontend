@@ -1,32 +1,60 @@
+/* ================= PRINT SETTINGS ================= */
+ 
 @media print {
-
-  body {
-    background: white !important;
+ 
+  @page {
+    size: A4 landscape;
+    margin: 8mm;
   }
-
-  button {
+ 
+  html, body {
+    width: 100%;
+    height: auto;
+    zoom: 0.75;
+    -webkit-print-color-adjust: exact;
+  }
+/* Hide action buttons */
+  .print:hidden {
     display: none !important;
   }
-
-  .sticky {
-    position: static !important;
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
-
-  .max-h-\[500px\] {
+ 
+  /* Hide buttons */
+  .print-hidden {
+    display: none !important;
+  }
+ 
+  /* Remove scroll/height restrictions */
+  .print-full {
     max-height: none !important;
     overflow: visible !important;
   }
-
+ 
+  /* Table settings */
   table {
     width: 100% !important;
+    border-collapse: collapse;
+    page-break-inside: auto;
   }
-
+ 
   thead {
-    display: table-header-group;
+    display: table-header-group;   /* Header repeat */
   }
-
+ 
+  tfoot {
+    display: table-footer-group;
+  }
+ 
   tr {
+    page-break-inside: avoid;      /* Prevent row cut */
+    page-break-after: auto;
+  }
+ 
+  td, th {
     page-break-inside: avoid;
   }
-
 }
+ 

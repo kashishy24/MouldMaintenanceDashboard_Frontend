@@ -184,10 +184,12 @@ const HCHistory = () => {
 
       const mapped = (rows || []).map((r, idx) => ({
         key: idx,
+        checkListID: r.CheckListID ?? "",
         checkListName: r.CheckListName ?? "",
         mouldName: r.MouldName ?? "",
         materialName: r.MaterialName ?? "",
         userId: r.UserID ?? "",
+        userName: r.userName ?? "",
         hcStatus: r.HCStatus ?? "",
         instance: r.Instance ?? "",
         remark: r.Remark ?? "",
@@ -225,7 +227,7 @@ const HCHistory = () => {
 
     try {
       // fetch chart, timeStats and delayStats in parallel
-      const [ , timeStats, delayStats ] = await Promise.all([
+      const [, timeStats, delayStats] = await Promise.all([
         fetchHcChart(start, end),
         fetchTimeStats(start, end),
         fetchDelayStats(start, end),
@@ -345,7 +347,7 @@ const HCHistory = () => {
                       <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">At Mould Life</th>
                       <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Start Time</th>
                       <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Remark</th>
-                                           <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Action</th>
+                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Action</th>
                     </tr>
                   </thead>
 
@@ -361,7 +363,7 @@ const HCHistory = () => {
                           <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{row.instance}</td>
                           <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.mouldName}</td>
                           <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{row.materialName}</td>
-                          <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{row.userId || "-"}</td>
+                          <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{row.userName || "-"}</td>
                           <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{row.hcStatus}</td>
                           <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.hcDuration}</td>
                           <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.atMouldLife ?? "-"}</td>
@@ -371,11 +373,22 @@ const HCHistory = () => {
                             {/* Action button - navigates to PMCheckPointReport with parameters */}
                             <button
                               className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                              onClick={() => navigate(`/HCCheckPointReport?checkListName=${encodeURIComponent(row.checkListName)}&mouldName=${encodeURIComponent(row.mouldName)}&instance=${encodeURIComponent(row.instance)}`)}
+                              //   onClick={() => navigate(`/HCCheckPointReport?checkListName=${encodeURIComponent(row.checkListName)}&mouldName=${encodeURIComponent(row.mouldName)}&instance=${encodeURIComponent(row.instance)}`)}
+                              onClick={() =>
+                                navigate(
+                                  `/HCCheckPointReport?checkListID=${row.checkListID}
+&instance=${row.instance}
+&mouldName=${encodeURIComponent(row.mouldName)}
+&materialName=${encodeURIComponent(row.materialName)}
+&atMouldLife=${row.atMouldLife}
+&userName=${encodeURIComponent(row.userName)}`
+                                )
+                              }
                             >
+
                               View Report
                             </button>
-                              </td>
+                          </td>
                         </tr>
                       ))
                     )}
