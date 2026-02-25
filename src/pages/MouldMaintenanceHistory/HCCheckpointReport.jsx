@@ -13,6 +13,8 @@ export default function HCCheckPointReport() {
 
   // Only take mouldName & instance
   const checkListID = searchParams.get("checkListID") || "";
+   const checkListName = searchParams.get("checkListName") || "";
+  const mouldID = searchParams.get("mouldID") || "";
   const mouldName = searchParams.get("mouldName") || "";
   const materialName = searchParams.get("materialName") || "";
   const mouldLife = searchParams.get("atMouldLife") || "";
@@ -41,6 +43,7 @@ export default function HCCheckPointReport() {
           params: {
             checkListID,
             instance,
+            mouldID
           },
         });
 
@@ -54,10 +57,10 @@ export default function HCCheckPointReport() {
       }
     };
 
-    if (checkListID && instance) {
+    if (checkListID && instance && mouldID) {
       fetchHeader();
     }
-  }, [checkListID, instance]);
+  }, [checkListID, instance, mouldID]);
   //-------------to show table data
   useEffect(() => {
     const fetchCheckpointDetails = async () => {
@@ -223,6 +226,7 @@ export default function HCCheckPointReport() {
     // ===== INFO CARD DATA =====
     const infoData = [
       ["Mould Name", mouldName],
+          ["CheckList Name", checkListName],
       ["HC Instance", instance],
       ["Part Name", headerData.PartName],
       ["Material Name", materialName],
@@ -233,9 +237,11 @@ export default function HCCheckPointReport() {
       ["Mould Life", mouldLife],
       ["HC Frequency", headerData.HCFreqCount],
       ["HC Due Shots", headerData.HCDueShots],
-      ["HC Done Shots", "223423"],
+      // ["HC Done Shots", "223423"],
       ["Approval Name", headerData.ApproverName],
       ["Customer Name", headerData.CustomerName],
+         ["Start Time", headerData.StartTime],
+      ["End Time", headerData.EndTime],
     ];
 
     autoTable(doc, {
@@ -312,8 +318,8 @@ export default function HCCheckPointReport() {
       <div className="px-4 py-4 bg-gray-100 min-h-screen">
         <div ref={printRef} className="w-full mx-auto space-y-4">
           {/* ===== MODERN INFO GRID ===== */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
-
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">
+  <InfoCard label="CheckList Name" value={checkListName} />
             <InfoCard label="Mould Name" value={mouldName} />
             <InfoCard label="Part Name" value={headerData.PartName} />
             <InfoCard label="Material Name" value={materialName} />
@@ -325,10 +331,11 @@ export default function HCCheckPointReport() {
             <InfoCard label="Mould Life" value={mouldLife} />
             <InfoCard label="HC Frequency" value={headerData.HCFreqCount} />
             <InfoCard label="HC Due Shots" value={headerData.HCDueShots} />
-            <InfoCard label="HC Done Shots" value="223423" />
+            {/* <InfoCard label="HC Done Shots" value="223423" /> */}
             <InfoCard label="Approval Name" value={headerData.ApproverName} />
             <InfoCard label="Customer Name" value={headerData.CustomerName} />
-
+            <InfoCard label="Start Time" value={headerData.StartTime} />
+            <InfoCard label="End Time" value={headerData.EndTime} />
           </div>
 
           {/* ===== ACTION BAR ===== */}
@@ -385,9 +392,10 @@ export default function HCCheckPointReport() {
               <table className="min-w-[1500px] w-full text-sm">
                 <thead className="bg-gray-900 text-white text-xs">
                   <tr>
-                    <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Instance</th>
+                    {/* <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Instance</th>
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">MouldName</th>
-                    <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700 ">Checklist Name</th>
+                    <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700 ">Checklist Name</th> */}
+                                        <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">TimeStamp</th>
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">Checkpoint Name</th>
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">CheckPoint Category</th>
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700"> Standard Condition</th>
@@ -401,7 +409,7 @@ export default function HCCheckPointReport() {
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">CheckPoint Value</th>
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">OK/NOK</th>
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">Observation</th>
-                    <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">TimeStamp</th>
+
                   </tr>
                 </thead>
 
@@ -418,9 +426,10 @@ export default function HCCheckPointReport() {
                         key={index}
                         className="border-b hover:bg-gray-50 transition"
                       >
-                        <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.instance}</td>
+                        {/* <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.instance}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.mouldName}</td>
-                        <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.checklistName}</td>
+                        <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.checklistName}</td> */}
+                                               <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.timeStamp}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.checkpointName}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.category}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.standardCondition}</td>
@@ -444,7 +453,7 @@ export default function HCCheckPointReport() {
                           </span>
                         </td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.remark}</td>
-                        <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.timeStamp}</td>
+
                       </tr>
                     ))
                   ) : (

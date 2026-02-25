@@ -182,6 +182,7 @@ export default function MouldMaintenanceHistory() {
       const mapped = (rows || []).map((r, idx) => ({
         key: idx,
         checkListID: r.CheckListID,
+        mouldID: r.MouldID,
         userName: r.UserName ?? "",
         checkListName: r.CheckListName ?? "",
         mouldName: r.MouldName ?? "",
@@ -391,6 +392,8 @@ export default function MouldMaintenanceHistory() {
                                 navigate(
                                   `/PMCheckPointReport?checkListID=${row.checkListID}
 &instance=${row.instance}
+&mouldID=${row.mouldID}
+&checkListName=${encodeURIComponent(row.checkListName)}
 &mouldName=${encodeURIComponent(row.mouldName)}
 &materialName=${encodeURIComponent(row.materialName)}
 &atMouldLife=${row.atMouldLife}

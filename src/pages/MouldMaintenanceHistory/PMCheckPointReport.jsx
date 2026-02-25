@@ -13,6 +13,8 @@ export default function PMCheckPointReport() {
 
   // Only take mouldName & instance
   const checkListID = searchParams.get("checkListID") || "";
+    const checkListName = searchParams.get("checkListName") || "";
+  const mouldID = searchParams.get("mouldID") || "";
   const mouldName = searchParams.get("mouldName") || "";
   const materialName = searchParams.get("materialName") || "";
   const mouldLife = searchParams.get("atMouldLife") || "";
@@ -42,6 +44,7 @@ export default function PMCheckPointReport() {
           params: {
             checkListID,
             instance,
+            mouldID
           },
         });
 
@@ -55,10 +58,10 @@ export default function PMCheckPointReport() {
       }
     };
 
-    if (checkListID && instance) {
+    if (checkListID && instance && mouldID) {
       fetchHeader();
     }
-  }, [checkListID, instance]);
+  }, [checkListID, instance, mouldID]);
   //-------------to show table data
   useEffect(() => {
     const fetchCheckpointDetails = async () => {
@@ -114,12 +117,12 @@ export default function PMCheckPointReport() {
   // };
 
   // ================= PRINT =================
- const handlePrint = () => {
-  const printContent = printRef.current.innerHTML;
- 
-  const WinPrint = window.open("", "", "width=1200,height=800");
- 
-  WinPrint.document.write(`
+  const handlePrint = () => {
+    const printContent = printRef.current.innerHTML;
+
+    const WinPrint = window.open("", "", "width=1200,height=800");
+
+    WinPrint.document.write(`
     <html>
       <head>
         <title>HC Report</title>
@@ -200,13 +203,13 @@ export default function PMCheckPointReport() {
       </body>
     </html>
   `);
- 
-  WinPrint.document.close();
-  WinPrint.focus();
-  WinPrint.print();
-  WinPrint.close();
-};
- 
+
+    WinPrint.document.close();
+    WinPrint.focus();
+    WinPrint.print();
+    WinPrint.close();
+  };
+
 
   // ================= EXCEL =================
   const exportToExcel = () => {
@@ -219,100 +222,103 @@ export default function PMCheckPointReport() {
   // ================= PDF =================
   // ================= FULL PDF =================
   const exportToPDF = () => {
-  const doc = new jsPDF("l", "mm", "a4"); // Landscape
+    const doc = new jsPDF("l", "mm", "a4"); // Landscape
 
-  // ===== TITLE =====
-  doc.setFontSize(16);
-  doc.text("PM Checkpoint Report", 14, 15);
+    // ===== TITLE =====
+    doc.setFontSize(16);
+    doc.text("PM Checkpoint Report", 14, 15);
 
-  doc.setFontSize(10);
+    doc.setFontSize(10);
 
-  // ===== INFO CARD DATA =====
-  const infoData = [
-    ["Mould Name", mouldName],
-    ["Part Name", headerData.PartName],
-    ["Material Name", materialName],
-    ["Model Code", headerData.ModelCode],
-    ["Machine Tonnage", headerData.MCTonnage],
-    ["User Name", userName],
-    ["Gate Type", headerData.GateType],
-    ["PM Instance", instance],
-    ["Mould Life", mouldLife],
-    ["PM Frequency", headerData.PMFreqCount],
-    ["PM Due Shots", headerData.PMDueShots],
-    ["PM Done Shots", "223423"],
-    ["Approval Name", headerData.ApproverName],
-    ["Customer Name", headerData.CustomerName],
-  ];
+    // ===== INFO CARD DATA =====
+    const infoData = [
+      ["Mould Name", mouldName],
+         ["CheckList Name", checkListName],
+      ["Part Name", headerData.PartName],
+      ["Material Name", materialName],
+      ["Model Code", headerData.ModelCode],
+      ["Machine Tonnage", headerData.MCTonnage],
+      ["User Name", userName],
+      ["Gate Type", headerData.GateType],
+      ["PM Instance", instance],
+      ["Mould Life", mouldLife],
+      ["PM Frequency", headerData.PMFreqCount],
+      ["PM Due Shots", headerData.PMDueShots],
+      // ["PM Done Shots", "223423"],
+      ["Approval Name", headerData.ApproverName],
+      ["Customer Name", headerData.CustomerName],
+      ["Start Time", headerData.StartTime],
+      ["End Time", headerData.EndTime],
+    ];
 
-  autoTable(doc, {
-    startY: 22,
-    head: [["Field", "Value"]],
-    body: infoData,
-    styles: {
-      fontSize: 8,
-    },
-    theme: "grid",
-  });
+    autoTable(doc, {
+      startY: 22,
+      head: [["Field", "Value"]],
+      body: infoData,
+      styles: {
+        fontSize: 8,
+      },
+      theme: "grid",
+    });
 
-  // ===== TABLE DATA =====
-  const tableColumn = [
-    "Instance",
-    "MouldName",
-    "Checklist Name",
-    "Checkpoint Name",
-    "Check Area",
-    "Checkpoint Item",
-    "CheckPoint Area",
-    "Checking Method",
-    "Judgement Criteria",
-    "CheckList Type",
-    "Upper Limit",
-    "Lower Limit",
-    "Standard",
-    "Value",
-    "OK/NOK",
-    "Observation",
-    "TimeStamp",
-  ];
+    // ===== TABLE DATA =====
+    const tableColumn = [
+      "Instance",
+      "MouldName",
+      "Checklist Name",
+      "Checkpoint Name",
+      "Check Area",
+      "Checkpoint Item",
+      "CheckPoint Area",
+      "Checking Method",
+      "Judgement Criteria",
+      "CheckList Type",
+      "Upper Limit",
+      "Lower Limit",
+      "Standard",
+      "Value",
+      "OK/NOK",
+      "Observation",
+      "TimeStamp",
+    ];
 
-  const tableRows = reportData.map((item) => [
-    item.instance || "-",
-    item.mouldName || "-",
-    item.checklistName || "-",
-    item.checkpointName || "-",
-    item.checkArea || "-",
-    item.checkpointItem || "-",
-    item.checkPointArea || "-",
-    item.checkingMethod || "-",
-    item.judgementCriteria || "-",
-    item.checkListType || "-",
-    item.upperLimit || "-",
-    item.lowerLimit || "-",
-    item.standard || "-",
-    item.value || "-",
-    item.status || "-",
-    item.remark || "-",
-    item.timeStamp
-      ? new Date(item.timeStamp).toLocaleString()
-      : "-",
-  ]);
+    const tableRows = reportData.map((item) => [
+      item.instance || "-",
+      item.mouldName || "-",
+      item.checklistName || "-",
+      item.checkpointName || "-",
+      item.checkArea || "-",
+      item.checkpointItem || "-",
+      item.checkPointArea || "-",
+      item.checkingMethod || "-",
+      item.judgementCriteria || "-",
+      item.checkListType || "-",
+      item.upperLimit || "-",
+      item.lowerLimit || "-",
+      item.standard || "-",
+      item.value || "-",
+      item.status || "-",
+      item.remark || "-",
+      item.timeStamp
+        ? new Date(item.timeStamp).toLocaleString()
+        : "-",
+    ]);
 
-  autoTable(doc, {
-    head: [tableColumn],
-    body: tableRows,
-    startY: doc.lastAutoTable.finalY + 10, // Start after info table
-    styles: {
-      fontSize: 6,
-    },
-    headStyles: {
-      fillColor: [41, 128, 185],
-    },
-    theme: "grid",
-  });
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: doc.lastAutoTable.finalY + 10, // Start after info table
+      styles: {
+        fontSize: 6,
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+      },
+      theme: "grid",
+    });
 
-  doc.save(`PM_Full_Report_${mouldName}_${instance}.pdf`);
-};
+    doc.save(`PM_Full_Report_${mouldName}_${instance}.pdf`);
+  };
 
   const InfoCard = ({ label, value }) => (
     <div className="bg-white border border-gray-200 
@@ -329,45 +335,14 @@ export default function PMCheckPointReport() {
     </div>
   );
 
-  // ===== TEMP DUMMY DATA =====
-  // useEffect(() => {
-  //   if (!loading && reportData.length === 0) {
-  //     const dummyData = Array.from({ length: 200 }, (_, index) => ({
-  //       instance: `INS-${index + 1}`,
-  //       mouldName: mouldName || "Mould-X",
-  //       checklistName: `Checklist ${index + 1}`,
-  //       checkpointName: `Checkpoint ${index + 1}`,
-  //       checkArea: `Area ${index % 5 + 1}`,
-  //       checkpointItem: `Item ${index + 1}`,
-  //       checkPointArea: `Zone ${index % 3 + 1}`,
-  //       checkingMethod: "Visual",
-  //       judgementCriteria: "Within Limit",
-  //       checkListType: "PM",
-  //       upperLimit: 100,
-  //       lowerLimit: 10,
-  //       standard: 50,
-  //       value: Math.floor(Math.random() * 100),
-  //       status:
-  //         index % 3 === 0
-  //           ? "OK"
-  //           : index % 3 === 1
-  //             ? "Warning"
-  //             : "NOK",
-  //       remark: "Dummy Remark",
-  //       timeStamp: new Date().toLocaleString(),
-  //     }));
-
-  //     setReportData(dummyData);
-  //   }
-  // }, [loading]);
 
   return (
     <DashboardLayout>
       <div className="px-4 py-4 bg-gray-100 min-h-screen">
         <div className="w-full mx-auto space-y-4" ref={printRef}>
           {/* ===== MODERN INFO GRID ===== */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
-
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">
+            <InfoCard label="CheckList Name" value={checkListName} />
             <InfoCard label="Mould Name" value={mouldName} />
             <InfoCard label="Part Name" value={headerData.PartName} />
             <InfoCard label="Material Name" value={materialName} />
@@ -379,10 +354,11 @@ export default function PMCheckPointReport() {
             <InfoCard label="Mould Life" value={mouldLife} />
             <InfoCard label="PM Frequency" value={headerData.PMFreqCount} />
             <InfoCard label="PM Due Shots" value={headerData.PMDueShots} />
-            <InfoCard label="PM Done Shots" value="223423" />
+            {/* <InfoCard label="PM Done Shots" value="223423" /> */}
             <InfoCard label="Approval Name" value={headerData.ApproverName} />
             <InfoCard label="Customer Name" value={headerData.CustomerName} />
-
+            <InfoCard label="Start Time" value={headerData.StartTime} />
+            <InfoCard label="End Time" value={headerData.EndTime} />
           </div>
 
           {/* ===== ACTION BAR ===== */}
@@ -431,31 +407,32 @@ export default function PMCheckPointReport() {
 
 
           {/* ===== CHECKPOINT TABLE ===== */}
-         <div className="bg-white rounded-2xl shadow-lg border">
-  {/* <div className="bg-blue-700 text-white px-6 py-4">
+          <div className="bg-white rounded-2xl shadow-lg border">
+            {/* <div className="bg-blue-700 text-white px-6 py-4">
   </div> */}
- 
-  <div className="max-h-[500px] overflow-auto">
-    <table className="min-w-[1500px] w-full text-sm">
+
+            <div className="max-h-[500px] overflow-auto">
+              <table className="min-w-[1500px] w-full text-sm">
                 <thead className="bg-gray-900 text-white text-xs">
                   <tr>
-                    <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Instance</th>
-                    <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">MouldName</th>
-                    <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Checklist Name</th>
+                    {/* <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Instance</th>
+                    <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">MouldName</th> */}
+                    {/* <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Checklist Name</th> */}
+                    <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">TimeStamp</th>
                     <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Checkpoint Name</th>
                     <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Check Area</th>
                     <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Checkpoint Item</th>
                     <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">CheckPoint Area</th>
                     <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Checking Method</th>
                     <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Judgement Criteria</th>
-                    <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">CheckList Type</th>
+                    {/* <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">CheckList Type</th> */}
                     <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Upper Limit</th>
                     <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Lower Limit</th>
                     <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Standard</th>
                     <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">CheckPoint Value</th>
                     <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">OK/NOK</th>
                     <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Observation</th>
-                    <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">TimeStamp</th>
+
                   </tr>
                 </thead>
 
@@ -472,16 +449,17 @@ export default function PMCheckPointReport() {
                         key={index}
                         className="border-b hover:bg-gray-50 transition"
                       >
-                        <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.instance}</td>
-                        <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.mouldName}</td>
-                        <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.checklistName}</td>
+                        {/* <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.instance}</td>
+                        <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.mouldName}</td> */}
+                        {/* <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.checklistName}</td> */}
+                        <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.timeStamp}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.checkpointName}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.checkArea}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.checkpointItem}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.checkPointArea}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.checkingMethod}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.judgementCriteria}</td>
-                        <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.checkListType}</td>
+                        {/* <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.checkListType}</td> */}
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.upperLimit}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.lowerLimit}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.standard}</td>
@@ -489,15 +467,15 @@ export default function PMCheckPointReport() {
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">
                           <span
                             className={`px-3 py-1 rounded-full text-white text-xs font-semibold ${item.status === "OK"
-                                ? "bg-green-500"
-                                : "bg-red-500"
+                              ? "bg-green-500"
+                              : "bg-red-500"
                               }`}
                           >
                             {item.status || "-"}
                           </span>
                         </td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.remark}</td>
-                        <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.timeStamp}</td>
+
                       </tr>
                     ))
                   ) : (

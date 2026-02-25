@@ -186,6 +186,7 @@ const HCHistory = () => {
         key: idx,
         checkListID: r.CheckListID ?? "",
         checkListName: r.CheckListName ?? "",
+         mouldID: r.MouldID,
         mouldName: r.MouldName ?? "",
         materialName: r.MaterialName ?? "",
         userId: r.UserID ?? "",
@@ -378,6 +379,8 @@ const HCHistory = () => {
                                 navigate(
                                   `/HCCheckPointReport?checkListID=${row.checkListID}
 &instance=${row.instance}
+&mouldID=${row.mouldID}
+&checkListName=${encodeURIComponent(row.checkListName)}
 &mouldName=${encodeURIComponent(row.mouldName)}
 &materialName=${encodeURIComponent(row.materialName)}
 &atMouldLife=${row.atMouldLife}
