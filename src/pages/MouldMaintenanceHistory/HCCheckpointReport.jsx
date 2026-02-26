@@ -13,7 +13,7 @@ export default function HCCheckPointReport() {
 
   // Only take mouldName & instance
   const checkListID = searchParams.get("checkListID") || "";
-   const checkListName = searchParams.get("checkListName") || "";
+  const checkListName = searchParams.get("checkListName") || "";
   const mouldID = searchParams.get("mouldID") || "";
   const mouldName = searchParams.get("mouldName") || "";
   const materialName = searchParams.get("materialName") || "";
@@ -76,22 +76,22 @@ export default function HCCheckPointReport() {
 
         if (res.data.success) {
           const mappedData = res.data.data.map((item) => ({
-          instance: item.Instance,
-          mouldName: item.MouldName,
-          checklistName: item.CheckListName,
-          checkpointName: item.CheckPointName,
-          category: item.CheckPointCategory,
-          standardCondition: item.StandardCondition,
-          uom: item.UOM,
-          checkingMethod: item.CheckingMethod,
-          checkPointType: item["Check Point Type"],
-          upperLimit: item.UpperLimit,
-          lowerLimit: item.LowerLimit,
-          standard: item.Standard,
-          value: item.CheckPointValue,
-          status: item.OKNOK,
-          remark: item.Observation,
-          timeStamp: item.Timestamp,
+            instance: item.Instance,
+            mouldName: item.MouldName,
+            checklistName: item.CheckListName,
+            checkpointName: item.CheckPointName,
+            category: item.CheckPointCategory,
+            standardCondition: item.StandardCondition,
+            uom: item.UOM,
+            checkingMethod: item.CheckingMethod,
+            checkPointType: item["Check Point Type"],
+            upperLimit: item.UpperLimit,
+            lowerLimit: item.LowerLimit,
+            standard: item.Standard,
+            value: item.CheckPointValue,
+            status: item.OKNOK,
+            remark: item.Observation,
+            timeStamp: item.Timestamp,
           }));
 
           setReportData(mappedData);
@@ -111,12 +111,12 @@ export default function HCCheckPointReport() {
 
 
   // ================= PRINT =================
- const handlePrint = () => {
-  const printContent = printRef.current.innerHTML;
- 
-  const WinPrint = window.open("", "", "width=1200,height=800");
- 
-  WinPrint.document.write(`
+  const handlePrint = () => {
+    const printContent = printRef.current.innerHTML;
+
+    const WinPrint = window.open("", "", "width=1200,height=800");
+
+    WinPrint.document.write(`
     <html>
       <head>
         <title>HC Report</title>
@@ -197,13 +197,13 @@ export default function HCCheckPointReport() {
       </body>
     </html>
   `);
- 
-  WinPrint.document.close();
-  WinPrint.focus();
-  WinPrint.print();
-  WinPrint.close();
-};
- 
+
+    WinPrint.document.close();
+    WinPrint.focus();
+    WinPrint.print();
+    WinPrint.close();
+  };
+
 
   // ================= EXCEL =================
   const exportToExcel = () => {
@@ -226,7 +226,7 @@ export default function HCCheckPointReport() {
     // ===== INFO CARD DATA =====
     const infoData = [
       ["Mould Name", mouldName],
-          ["CheckList Name", checkListName],
+      ["CheckList Name", checkListName],
       ["HC Instance", instance],
       ["Part Name", headerData.PartName],
       ["Material Name", materialName],
@@ -240,7 +240,7 @@ export default function HCCheckPointReport() {
       // ["HC Done Shots", "223423"],
       ["Approval Name", headerData.ApproverName],
       ["Customer Name", headerData.CustomerName],
-         ["Start Time", headerData.StartTime],
+      ["Start Time", headerData.StartTime],
       ["End Time", headerData.EndTime],
     ];
 
@@ -319,7 +319,7 @@ export default function HCCheckPointReport() {
         <div ref={printRef} className="w-full mx-auto space-y-4">
           {/* ===== MODERN INFO GRID ===== */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">
-  <InfoCard label="CheckList Name" value={checkListName} />
+            <InfoCard label="CheckList Name" value={checkListName} />
             <InfoCard label="Mould Name" value={mouldName} />
             <InfoCard label="Part Name" value={headerData.PartName} />
             <InfoCard label="Material Name" value={materialName} />
@@ -395,13 +395,13 @@ export default function HCCheckPointReport() {
                     {/* <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 z-10">Instance</th>
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">MouldName</th>
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700 ">Checklist Name</th> */}
-                                        <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">TimeStamp</th>
+                    <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">TimeStamp</th>
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">Checkpoint Name</th>
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">CheckPoint Category</th>
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700"> Standard Condition</th>
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">UOM</th>
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">Checking Method</th>
-                   
+
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">checkPoint Type</th>
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">Upper Limit</th>
                     <th className="p-3 text-left border whitespace-nowrap sticky top-0 bg-blue-700">Lower Limit</th>
@@ -429,7 +429,7 @@ export default function HCCheckPointReport() {
                         {/* <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.instance}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.mouldName}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.checklistName}</td> */}
-                                               <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.timeStamp}</td>
+                        <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.timeStamp}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.checkpointName}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.category}</td>
                         <td className="p-3 border whitespace-nowrap text-center  font-medium text-black">{item.standardCondition}</td>

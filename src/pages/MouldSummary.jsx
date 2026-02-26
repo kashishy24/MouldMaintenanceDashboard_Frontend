@@ -43,44 +43,46 @@ const MouldSummary = () => {
   const [hcOnTimeData, setHcOnTimeData] = useState([]); // [{ month, OnTime, Delayed }]
   const [loadingOnTime, setLoadingOnTime] = useState(false);
 
-  // ---------------- Production History Dummy Data ----------------
-  const productionData = [
-    { machine: "MC-101", mould: "M-01", shotCount: 12500 },
-    { machine: "MC-102", mould: "M-01", shotCount: 9800 },
-    { machine: "MC-103", mould: "M-01", shotCount: 15700 },
-    { machine: "MC-104", mould: "M-01", shotCount: 7600 },
-  ];
+
+  // Production History (Machine Wise Shot Count)
+  const [productionData, setProductionData] = useState([]);
+  const [loadingProduction, setLoadingProduction] = useState(false);
+
+  // Machine dropdown + table states
+  const [machineList, setMachineList] = useState([]);
+  const [machineTableData, setMachineTableData] = useState([]);
+  const [loadingMachineTable, setLoadingMachineTable] = useState(false);
 
   // ---------------- Machine Dropdown + Table ----------------
-const [selectedMachine, setSelectedMachine] = useState("ALL");
+  const [selectedMachine, setSelectedMachine] = useState("ALL");
 
-  const machineList = ["MC-101", "MC-102", "MC-103", "MC-104"];
+  //const machineList = ["MC-101", "MC-102", "MC-103", "MC-104"];
 
-  const machineTableData = [
-    {
-      machine: "MC-101",
-      mouldId: "M-01",
-      loadingTime: "10 Feb 2026 08:30 AM",
-      unloadingTime: "15 Feb 2026 05:45 PM",
-      loadingShot: 5000,
-      unloadingShot: 12500,
-    },
-    {
-      machine: "MC-102",
-      mouldId: "M-01",
-      loadingTime: "05 Feb 2026 09:15 AM",
-      unloadingTime: "12 Feb 2026 06:10 PM",
-      loadingShot: 4000,
-      unloadingShot: 9800,
-    },
-  ];
+  // const machineTableData = [
+  //   {
+  //     machine: "MC-101",
+  //     mouldId: "M-01",
+  //     loadingTime: "10 Feb 2026 08:30 AM",
+  //     unloadingTime: "15 Feb 2026 05:45 PM",
+  //     loadingShot: 5000,
+  //     unloadingShot: 12500,
+  //   },
+  //   {
+  //     machine: "MC-102",
+  //     mouldId: "M-01",
+  //     loadingTime: "05 Feb 2026 09:15 AM",
+  //     unloadingTime: "12 Feb 2026 06:10 PM",
+  //     loadingShot: 4000,
+  //     unloadingShot: 9800,
+  //   },
+  // ];
 
- const filteredMachineData =
-  selectedMachine === "ALL"
-    ? machineTableData
-    : machineTableData.filter(
-        (row) => row.machine === selectedMachine
-      );
+  // const filteredMachineData =
+  //   selectedMachine === "ALL"
+  //     ? machineTableData
+  //     : machineTableData.filter(
+  //       (row) => row.machine === selectedMachine
+  //     );
 
   // ---------------- Fetch mould list on load ----------------
   useEffect(() => {
@@ -215,8 +217,8 @@ const [selectedMachine, setSelectedMachine] = useState("ALL");
               setLoadingSpare(true);
               setLoadingOnTime(true);
               setSpareError(null);
-
-              const [durRes, occRes, spareRes, pmOnRes, hcOnRes] =
+              setLoadingProduction(true);
+              const [durRes, occRes, spareRes, pmOnRes, hcOnRes, prodRes, machineRes] =
                 await Promise.all([
                   axios.get(
                     `${BASE}/MouldSummary/DashboardGetTop5BreakDownsByDuration`,
@@ -244,6 +246,13 @@ const [selectedMachine, setSelectedMachine] = useState("ALL");
                       params: { mouldId },
                     },
                   ),
+                  axios.get(
+                    `${BASE}/MouldSummary/Dashboard_GET_MachineWiseShotCount_ByMould`,
+                    {
+                      params: { mouldName },
+                    }
+                  ),
+                  axios.get(`${BASE}/MouldSummary/Dashboard_GET_Machines_ByMouldName`, { params: { mouldName } })
                 ]);
 
               // Parse Duration API
@@ -270,12 +279,12 @@ const [selectedMachine, setSelectedMachine] = useState("ALL");
                   const reason = r.BDReason || r.Reason || r.Label || "Unknown";
                   const count = Number(
                     r.OccurrenceCount ??
-                      r.TotalOccurrences ??
-                      r.Count ??
-                      Object.values(r).find(
-                        (v) => Number.isFinite(Number(v)) && Number(v) >= 0,
-                      ) ??
-                      0,
+                    r.TotalOccurrences ??
+                    r.Count ??
+                    Object.values(r).find(
+                      (v) => Number.isFinite(Number(v)) && Number(v) >= 0,
+                    ) ??
+                    0,
                   );
                   return { reason, count };
                 },
@@ -307,6 +316,29 @@ const [selectedMachine, setSelectedMachine] = useState("ALL");
               const hcRows = hcOnRes.data?.data ?? [];
               const groupedHc = groupOnTimeRows(hcRows);
               setHcOnTimeData(groupedHc);
+
+              // Parse Production History API
+              let prodRows = prodRes.data?.data ?? [];
+
+              const parsedProduction = (Array.isArray(prodRows) ? prodRows : []).map(p => ({
+                machine: p.EquipmentName,
+                shotCount: Number(p.ShotCount || 0),   // 🔥 Convert string → number
+              }));
+
+              setProductionData(parsedProduction);
+
+              // Parse Machine List API
+              let machineRows = machineRes.data?.data ?? [];
+
+              const parsedMachines = (Array.isArray(machineRows) ? machineRows : []).map(m => ({
+                id: m.EquipmentID,
+                name: m.EquipmentName
+              }));
+
+              setMachineList(parsedMachines);
+              setSelectedMachine("");   // reset selection
+              setMachineTableData([]);  // clear table
+
             } catch (err) {
               console.error(
                 "Error fetching breakdown/spare/on-time APIs:",
@@ -322,6 +354,7 @@ const [selectedMachine, setSelectedMachine] = useState("ALL");
               setLoadingBreakdown(false);
               setLoadingSpare(false);
               setLoadingOnTime(false);
+              setLoadingProduction(false);
             }
           })();
 
@@ -366,6 +399,45 @@ const [selectedMachine, setSelectedMachine] = useState("ALL");
       value: overview?.NextHCByShotCount ?? "--",
     },
   ];
+  const handleMachineChange = async (e) => {
+    const machineName = e.target.value;
+    setSelectedMachine(machineName);
+
+    if (!machineName) {
+      setMachineTableData([]);
+      return;
+    }
+
+    try {
+      setLoadingMachineTable(true);
+
+      const res = await axios.get(
+        `${BASE}/MouldSummary/Dashboard_GET_MachineMouldProductionDetails`,
+        {
+          params: { equipmentName: machineName },
+        }
+      );
+
+      let rows = res.data?.data ?? [];
+
+      const parsedTable = (Array.isArray(rows) ? rows : []).map(r => ({
+        mouldId: r.MouldID,
+        loadingTime: formatDate(r.LoadingTime),
+        unloadingTime: formatDate(r.UnloadingTime),
+        loadingShot: Number(r.LoadingShotCount || 0),
+        unloadingShot: Number(r.UnLoadingShotCount || 0),
+        totalShot: Number(r.TotalShotCount || 0),
+      }));
+
+      setMachineTableData(parsedTable);
+
+    } catch (err) {
+      console.error("Error fetching machine production details:", err);
+      setMachineTableData([]);
+    } finally {
+      setLoadingMachineTable(false);
+    }
+  };
 
   // ---------------- UI START ----------------
   return (
@@ -443,41 +515,47 @@ const [selectedMachine, setSelectedMachine] = useState("ALL");
           </h2>
         </div>
 
-       {/* ---------------- PRODUCTION HORIZONTAL BAR CHART ---------------- */}
-<div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 mb-8">
-  <h3 className="text-lg font-semibold mb-4 text-black text-center">
-    Machine Wise Shot Count
-  </h3>
+        {/* ---------------- PRODUCTION HORIZONTAL BAR CHART ---------------- */}
+        <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 mb-8">
+          <h3 className="text-lg font-semibold mb-4 text-black text-center">
+            Machine Wise Shot Count
+          </h3>
 
-  <div className="h-[320px]">
-    <ResponsiveContainer width="100%" height="100%">
-      <BarChart
-        data={productionData}
-        layout="vertical"
-        margin={{ top: 10, right: 30, left: 20, bottom: 10 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        
-        <XAxis type="number" />
-        
-        <YAxis
-          dataKey="machine"
-          type="category"
-          width={100}
-        />
-        
-        <Tooltip />
-        <Legend />
-        
-        <Bar
-          dataKey="shotCount"
-          fill="#222156"
-          radius={[0, 6, 6, 0]}
-        />
-      </BarChart>
-    </ResponsiveContainer>
-  </div>
-</div>
+          <div className="h-[320px]">
+            {loadingProduction ? (
+              <div className="flex items-center justify-center h-full">
+                Loading production data...
+              </div>
+            ) : productionData.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-sm text-gray-600">
+                No production data for selected mould.
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={productionData}
+                  layout="vertical"
+                  margin={{ top: 10, right: 30, left: 20, bottom: 10 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis
+                    dataKey="machine"
+                    type="category"
+                    width={120}
+                  />
+                  <Tooltip />
+                  <Legend />
+                  <Bar
+                    dataKey="shotCount"
+                    fill="#222156"
+                    radius={[0, 6, 6, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
 
         {/* ---------------- MACHINE DROPDOWN ---------------- */}
         <div className="bg-white rounded-2xl p-2 shadow-lg border border-gray-100 mb-6">
@@ -487,24 +565,24 @@ const [selectedMachine, setSelectedMachine] = useState("ALL");
             </h3>
 
             <div className="flex items-center gap-4">
-  <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">
-    Select Machine ID
-  </label>
+              <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">
+                Select Machine Name
+              </label>
 
-  <select
-  value={selectedMachine}
-  onChange={(e) => setSelectedMachine(e.target.value)}
-  className="border border-gray-300 px-4 py-2 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:outline-none bg-gray-50 min-w-[200px]"
->
-  <option value="">-- Select Machine --</option>
-  <option value="ALL">All</option>   {/* ✅ Added */}
-  {machineList.map((machine, index) => (
-    <option key={index} value={machine}>
-      {machine}
-    </option>
-  ))}
-</select>
-</div>
+              <select
+                value={selectedMachine}
+                onChange={handleMachineChange}
+                className="border border-gray-300 px-4 py-2 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:outline-none bg-gray-50 min-w-[200px]"
+              >
+                <option value="">-- Select Machine --</option>
+
+                {machineList.map((machine) => (
+                  <option key={machine.id} value={machine.name}>
+                    {machine.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -514,7 +592,11 @@ const [selectedMachine, setSelectedMachine] = useState("ALL");
             <div className="p-6 text-center text-gray-500">
               Please select a machine to view production details.
             </div>
-          ) : filteredMachineData.length === 0 ? (
+          ) : loadingMachineTable ? (
+            <div className="p-6 text-center text-gray-500">
+              Loading machine data...
+            </div>
+          ) : machineTableData.length === 0 ? (
             <div className="p-6 text-center text-gray-500">
               No data available for selected machine.
             </div>
@@ -532,18 +614,15 @@ const [selectedMachine, setSelectedMachine] = useState("ALL");
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredMachineData.map((row, index) => (
-                    <tr
-                      key={index}
-                      className="border-b hover:bg-indigo-50 transition"
-                    >
+                  {machineTableData.map((row, index) => (
+                    <tr key={index} className="border-b hover:bg-indigo-50 transition">
                       <td className="px-6 py-4 font-semibold">{row.mouldId}</td>
                       <td className="px-6 py-4">{row.loadingTime}</td>
                       <td className="px-6 py-4">{row.unloadingTime}</td>
                       <td className="px-6 py-4">{row.loadingShot}</td>
                       <td className="px-6 py-4">{row.unloadingShot}</td>
                       <td className="px-6 py-4 font-bold text-indigo-600">
-                        {row.unloadingShot - row.loadingShot}
+                        {row.totalShot}
                       </td>
                     </tr>
                   ))}
