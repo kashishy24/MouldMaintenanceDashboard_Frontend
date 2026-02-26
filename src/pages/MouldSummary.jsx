@@ -43,6 +43,45 @@ const MouldSummary = () => {
   const [hcOnTimeData, setHcOnTimeData] = useState([]); // [{ month, OnTime, Delayed }]
   const [loadingOnTime, setLoadingOnTime] = useState(false);
 
+  // ---------------- Production History Dummy Data ----------------
+  const productionData = [
+    { machine: "MC-101", mould: "M-01", shotCount: 12500 },
+    { machine: "MC-102", mould: "M-01", shotCount: 9800 },
+    { machine: "MC-103", mould: "M-01", shotCount: 15700 },
+    { machine: "MC-104", mould: "M-01", shotCount: 7600 },
+  ];
+
+  // ---------------- Machine Dropdown + Table ----------------
+const [selectedMachine, setSelectedMachine] = useState("ALL");
+
+  const machineList = ["MC-101", "MC-102", "MC-103", "MC-104"];
+
+  const machineTableData = [
+    {
+      machine: "MC-101",
+      mouldId: "M-01",
+      loadingTime: "10 Feb 2026 08:30 AM",
+      unloadingTime: "15 Feb 2026 05:45 PM",
+      loadingShot: 5000,
+      unloadingShot: 12500,
+    },
+    {
+      machine: "MC-102",
+      mouldId: "M-01",
+      loadingTime: "05 Feb 2026 09:15 AM",
+      unloadingTime: "12 Feb 2026 06:10 PM",
+      loadingShot: 4000,
+      unloadingShot: 9800,
+    },
+  ];
+
+ const filteredMachineData =
+  selectedMachine === "ALL"
+    ? machineTableData
+    : machineTableData.filter(
+        (row) => row.machine === selectedMachine
+      );
+
   // ---------------- Fetch mould list on load ----------------
   useEffect(() => {
     const fetchMouldNames = async () => {
@@ -78,8 +117,12 @@ const MouldSummary = () => {
     const map = new Map();
     (Array.isArray(rows) ? rows : []).forEach((r) => {
       const monthKey = r.MonthName || r.YearMonth || r.month || "Unknown";
-      const remark = (r.Remark || r.remark || "").toString().trim().toLowerCase();
-      if (!map.has(monthKey)) map.set(monthKey, { month: monthKey, OnTime: 0, Delayed: 0 });
+      const remark = (r.Remark || r.remark || "")
+        .toString()
+        .trim()
+        .toLowerCase();
+      if (!map.has(monthKey))
+        map.set(monthKey, { month: monthKey, OnTime: 0, Delayed: 0 });
       const entry = map.get(monthKey);
       if (remark === "ontime" || remark === "on time") entry.OnTime += 1;
       else entry.Delayed += 1;
@@ -91,7 +134,12 @@ const MouldSummary = () => {
       // try parse YearMonth
       const ay = (a.month || "").split("/").map(Number);
       const by = (b.month || "").split("/").map(Number);
-      if (ay.length === 2 && by.length === 2 && !isNaN(ay[0]) && !isNaN(by[0])) {
+      if (
+        ay.length === 2 &&
+        by.length === 2 &&
+        !isNaN(ay[0]) &&
+        !isNaN(by[0])
+      ) {
         if (ay[0] !== by[0]) return ay[0] - by[0];
         return ay[1] - by[1];
       }
@@ -140,11 +188,13 @@ const MouldSummary = () => {
               setLoadingOverview(true);
               const ovRes = await axios.get(
                 `${BASE}/MouldSummary/mouldPMHCOverview`,
-                { params: { mouldId } }
+                { params: { mouldId } },
               );
               if (ovRes.data?.success) {
                 setOverview(
-                  Array.isArray(ovRes.data.data) ? ovRes.data.data[0] : ovRes.data.data
+                  Array.isArray(ovRes.data.data)
+                    ? ovRes.data.data[0]
+                    : ovRes.data.data,
                 );
               } else {
                 console.error("Invalid overview response", ovRes.data);
@@ -166,51 +216,70 @@ const MouldSummary = () => {
               setLoadingOnTime(true);
               setSpareError(null);
 
-              const [durRes, occRes, spareRes, pmOnRes, hcOnRes] = await Promise.all([
-                axios.get(`${BASE}/MouldSummary/DashboardGetTop5BreakDownsByDuration`, {
-                  params: { mouldId },
-                }),
-                axios.get(
-                  `${BASE}/MouldSummary/DashboardGetTop5BreakDownsByOccurrences`,
-                  { params: { mouldId } }
-                ),
-                axios.get(
-                  `${BASE}/MouldSummary/Dashboard_GetTop10SpareParts_ByMould`,
-                  { params: { mouldId } }
-                ),
-                axios.get(`${BASE}/MouldSummary/Dashboard_PM_OnTimeVsDelayed`, {
-                  params: { mouldId },
-                }),
-                axios.get(`${BASE}/MouldSummary/Dashboard_HC_OnTimeVsDelayed`, {
-                  params: { mouldId },
-                }),
-              ]);
+              const [durRes, occRes, spareRes, pmOnRes, hcOnRes] =
+                await Promise.all([
+                  axios.get(
+                    `${BASE}/MouldSummary/DashboardGetTop5BreakDownsByDuration`,
+                    {
+                      params: { mouldId },
+                    },
+                  ),
+                  axios.get(
+                    `${BASE}/MouldSummary/DashboardGetTop5BreakDownsByOccurrences`,
+                    { params: { mouldId } },
+                  ),
+                  axios.get(
+                    `${BASE}/MouldSummary/Dashboard_GetTop10SpareParts_ByMould`,
+                    { params: { mouldId } },
+                  ),
+                  axios.get(
+                    `${BASE}/MouldSummary/Dashboard_PM_OnTimeVsDelayed`,
+                    {
+                      params: { mouldId },
+                    },
+                  ),
+                  axios.get(
+                    `${BASE}/MouldSummary/Dashboard_HC_OnTimeVsDelayed`,
+                    {
+                      params: { mouldId },
+                    },
+                  ),
+                ]);
 
               // Parse Duration API
               let durRows = durRes.data?.data ?? [];
-              const parsedDur = (Array.isArray(durRows) ? durRows : []).map((r) => {
-                const reason = r.BDReason || r.Reason || r.Label || "Unknown";
-                const numericKey = Object.keys(r).find(
-                  (k) => k !== "BDReason" && r[k] != null && !isNaN(Number(r[k]))
-                );
-                const duration = numericKey ? Number(r[numericKey]) : Number(r.Duration ?? 0);
-                return { reason, duration };
-              });
+              const parsedDur = (Array.isArray(durRows) ? durRows : []).map(
+                (r) => {
+                  const reason = r.BDReason || r.Reason || r.Label || "Unknown";
+                  const numericKey = Object.keys(r).find(
+                    (k) =>
+                      k !== "BDReason" && r[k] != null && !isNaN(Number(r[k])),
+                  );
+                  const duration = numericKey
+                    ? Number(r[numericKey])
+                    : Number(r.Duration ?? 0);
+                  return { reason, duration };
+                },
+              );
               setBreakdownDuration(parsedDur);
 
               // Parse Occurrence API
               let occRows = occRes.data?.data ?? [];
-              const parsedOcc = (Array.isArray(occRows) ? occRows : []).map((r) => {
-                const reason = r.BDReason || r.Reason || r.Label || "Unknown";
-                const count = Number(
-                  r.OccurrenceCount ??
-                    r.TotalOccurrences ??
-                    r.Count ??
-                    Object.values(r).find((v) => Number.isFinite(Number(v)) && Number(v) >= 0) ??
-                    0
-                );
-                return { reason, count };
-              });
+              const parsedOcc = (Array.isArray(occRows) ? occRows : []).map(
+                (r) => {
+                  const reason = r.BDReason || r.Reason || r.Label || "Unknown";
+                  const count = Number(
+                    r.OccurrenceCount ??
+                      r.TotalOccurrences ??
+                      r.Count ??
+                      Object.values(r).find(
+                        (v) => Number.isFinite(Number(v)) && Number(v) >= 0,
+                      ) ??
+                      0,
+                  );
+                  return { reason, count };
+                },
+              );
               setBreakdownOccurrence(parsedOcc);
 
               // Parse SpareParts API
@@ -220,13 +289,15 @@ const MouldSummary = () => {
               //   qty: Number(s.TotalQuantityUsed ?? s.Quantity ?? s.TotalUsed ?? 0),
               // }));
               // setSpareParts(parsedSpare);
-let spareRows = spareRes.data?.data ?? [];
-              const parsedSpare = (Array.isArray(spareRows) ? spareRows : []).map((s) => ({
-  id: s.SparePartID ?? null,
-  name: s.SparePartName ?? `Part-${s.SparePartID ?? "?"}`,
-  qty: Number(s.TotalQuantityUsed ?? 0),
-}));
-setSpareParts(parsedSpare);
+              let spareRows = spareRes.data?.data ?? [];
+              const parsedSpare = (
+                Array.isArray(spareRows) ? spareRows : []
+              ).map((s) => ({
+                id: s.SparePartID ?? null,
+                name: s.SparePartName ?? `Part-${s.SparePartID ?? "?"}`,
+                qty: Number(s.TotalQuantityUsed ?? 0),
+              }));
+              setSpareParts(parsedSpare);
               // Parse PM OnTime API
               const pmRows = pmOnRes.data?.data ?? [];
               const groupedPm = groupOnTimeRows(pmRows);
@@ -237,7 +308,10 @@ setSpareParts(parsedSpare);
               const groupedHc = groupOnTimeRows(hcRows);
               setHcOnTimeData(groupedHc);
             } catch (err) {
-              console.error("Error fetching breakdown/spare/on-time APIs:", err);
+              console.error(
+                "Error fetching breakdown/spare/on-time APIs:",
+                err,
+              );
               setBreakdownDuration([]);
               setBreakdownOccurrence([]);
               setSpareParts([]);
@@ -267,20 +341,30 @@ setSpareParts(parsedSpare);
     { title: "Mould Current Life", value: overview?.MouldCurrentLife ?? "--" },
     {
       title: "Mould Current Life in Days",
-      value: overview ? (overview["Mould Current Life in Days"] ?? overview.MouldCurrentLifeInDays ?? "--") : "--",
+      value: overview
+        ? (overview["Mould Current Life in Days"] ??
+          overview.MouldCurrentLifeInDays ??
+          "--")
+        : "--",
     },
     { title: "Number of PM Done", value: overview?.NumberOfPMDone ?? "--" },
     { title: "PM Shot Count", value: overview?.LastPMShotcount ?? "--" },
     { title: "Last PM Date", value: formatDate(overview?.LastPMDate) },
     { title: "Next PM By Date", value: formatDate(overview?.NextPMDueDate) },
-    { title: "Next PM By Shot Count", value: overview?.NextPMByShotCount ?? "--" },
+    {
+      title: "Next PM By Shot Count",
+      value: overview?.NextPMByShotCount ?? "--",
+    },
     { title: "HC Start Date", value: formatDate(overview?.HCStartDate) },
     { title: "HC Start Count", value: overview?.HCStartCount ?? "--" },
     { title: "Number HC Done", value: overview?.NumberOfHCDone ?? "--" },
     { title: "Last HC Shot Count", value: overview?.LastHCShotcount ?? "--" },
     { title: "Last HC Date", value: formatDate(overview?.LastHCDate) },
     { title: "Next HC By Date", value: formatDate(overview?.NextHCDueDate) },
-    { title: "Next HC By Shot Count", value: overview?.NextHCByShotCount ?? "--" },
+    {
+      title: "Next HC By Shot Count",
+      value: overview?.NextHCByShotCount ?? "--",
+    },
   ];
 
   // ---------------- UI START ----------------
@@ -292,7 +376,9 @@ setSpareParts(parsedSpare);
           <div className="grid grid-cols-3 gap-6">
             {/* --- Mould Name Dropdown --- */}
             <div>
-              <label className="font-semibold text-gray-700 mb-1 block">Select Mould</label>
+              <label className="font-semibold text-gray-700 mb-1 block">
+                Select Mould
+              </label>
               <select
                 className="w-full border border-gray-300 px-4 py-3 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none bg-gray-50 text-black"
                 value={selectedMould}
@@ -309,7 +395,9 @@ setSpareParts(parsedSpare);
 
             {/* --- Mould ID --- */}
             <div>
-              <label className="font-semibold text-gray-700 mb-1 block">Mould ID</label>
+              <label className="font-semibold text-gray-700 mb-1 block">
+                Mould ID
+              </label>
               <div className="bg-gray-100 px-4 py-3 rounded-lg shadow-sm font-semibold text-gray-800">
                 {mouldInfo.MouldID || "--"}
               </div>
@@ -317,7 +405,9 @@ setSpareParts(parsedSpare);
 
             {/* --- Mould Description --- */}
             <div>
-              <label className="font-semibold text-gray-700 mb-1 block">Mould Description</label>
+              <label className="font-semibold text-gray-700 mb-1 block">
+                Mould Description
+              </label>
               <div className="bg-gray-100 px-4 py-3 rounded-lg shadow-sm font-semibold text-gray-800">
                 {mouldInfo.MouldDesc || "--"}
               </div>
@@ -328,32 +418,168 @@ setSpareParts(parsedSpare);
         {/* ---------------- KPI BLUE CARDS ---------------- */}
         <div className="grid grid-cols-5 gap-4 mb-6">
           {loadingOverview && (
-            <div className="col-span-5 text-center text-sm text-gray-600">Loading KPIs...</div>
+            <div className="col-span-5 text-center text-sm text-gray-600">
+              Loading KPIs...
+            </div>
           )}
 
           {kpis.map((item, idx) => (
-            <div key={idx} className="bg-blue-100 border border-blue-500 p-3 rounded-xl shadow text-center">
+            <div
+              key={idx}
+              className="bg-blue-100 border border-blue-500 p-3 rounded-xl shadow text-center"
+            >
               <p className="text-xs text-black font-semibold">{item.title}</p>
-              <p className="text-lg font-bold text-black">{item.value ?? "--"}</p>
+              <p className="text-lg font-bold text-black">
+                {item.value ?? "--"}
+              </p>
             </div>
           ))}
+        </div>
+
+        {/* ---------------- PRODUCTION HISTORY TITLE STRIP ---------------- */}
+        <div className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-2 px-2 rounded-xl shadow-lg mb-2">
+          <h2 className="text-lg font-semibold tracking-wide text-center">
+            Production History
+          </h2>
+        </div>
+
+       {/* ---------------- PRODUCTION HORIZONTAL BAR CHART ---------------- */}
+<div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 mb-8">
+  <h3 className="text-lg font-semibold mb-4 text-black text-center">
+    Machine Wise Shot Count
+  </h3>
+
+  <div className="h-[320px]">
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart
+        data={productionData}
+        layout="vertical"
+        margin={{ top: 10, right: 30, left: 20, bottom: 10 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        
+        <XAxis type="number" />
+        
+        <YAxis
+          dataKey="machine"
+          type="category"
+          width={100}
+        />
+        
+        <Tooltip />
+        <Legend />
+        
+        <Bar
+          dataKey="shotCount"
+          fill="#222156"
+          radius={[0, 6, 6, 0]}
+        />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+</div>
+
+        {/* ---------------- MACHINE DROPDOWN ---------------- */}
+        <div className="bg-white rounded-2xl p-2 shadow-lg border border-gray-100 mb-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <h3 className="text-lg font-semibold text-black">
+              Machine Production Details
+            </h3>
+
+            <div className="flex items-center gap-4">
+  <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">
+    Select Machine ID
+  </label>
+
+  <select
+  value={selectedMachine}
+  onChange={(e) => setSelectedMachine(e.target.value)}
+  className="border border-gray-300 px-4 py-2 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:outline-none bg-gray-50 min-w-[200px]"
+>
+  <option value="">-- Select Machine --</option>
+  <option value="ALL">All</option>   {/* ✅ Added */}
+  {machineList.map((machine, index) => (
+    <option key={index} value={machine}>
+      {machine}
+    </option>
+  ))}
+</select>
+</div>
+          </div>
+        </div>
+
+        {/* ---------------- MACHINE TABLE ---------------- */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          {selectedMachine === "" ? (
+            <div className="p-6 text-center text-gray-500">
+              Please select a machine to view production details.
+            </div>
+          ) : filteredMachineData.length === 0 ? (
+            <div className="p-6 text-center text-gray-500">
+              No data available for selected machine.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm text-left">
+                <thead className="bg-blue-900 text-white">
+                  <tr>
+                    <th className="px-6 py-3">Mould ID</th>
+                    <th className="px-6 py-3">Loading Time</th>
+                    <th className="px-6 py-3">Unloading Time</th>
+                    <th className="px-6 py-3">Loading Shot Count</th>
+                    <th className="px-6 py-3">Unloading Shot Count</th>
+                    <th className="px-6 py-3">Total Shot Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredMachineData.map((row, index) => (
+                    <tr
+                      key={index}
+                      className="border-b hover:bg-indigo-50 transition"
+                    >
+                      <td className="px-6 py-4 font-semibold">{row.mouldId}</td>
+                      <td className="px-6 py-4">{row.loadingTime}</td>
+                      <td className="px-6 py-4">{row.unloadingTime}</td>
+                      <td className="px-6 py-4">{row.loadingShot}</td>
+                      <td className="px-6 py-4">{row.unloadingShot}</td>
+                      <td className="px-6 py-4 font-bold text-indigo-600">
+                        {row.unloadingShot - row.loadingShot}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* ---------------- PM & HC OnTime vs Delayed Charts ---------------- */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
           {/* PM OnTime vs Delayed */}
           <div className="bg-white rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100">
-            <h2 className="text-xl font-semibold mb-4 text-black text-center">PM OnTime vs Delayed</h2>
+            <h2 className="text-xl font-semibold mb-4 text-black text-center">
+              PM OnTime vs Delayed
+            </h2>
             <div className="h-[320px]">
               {loadingOnTime ? (
-                <div className="flex items-center justify-center h-full">Loading...</div>
+                <div className="flex items-center justify-center h-full">
+                  Loading...
+                </div>
               ) : pmOnTimeData.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-sm text-gray-600">No PM on-time data for selected mould.</div>
+                <div className="flex items-center justify-center h-full text-sm text-gray-600">
+                  No PM on-time data for selected mould.
+                </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={pmOnTimeData} margin={{ bottom: 20 }}>
                     <CartesianGrid strokeDasharray="4 4" />
-                    <XAxis dataKey="month" tick={{ fontSize: 12, fontWeight: "bold" }} angle={-20} textAnchor="end" height={64} />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fontSize: 12, fontWeight: "bold" }}
+                      angle={-20}
+                      textAnchor="end"
+                      height={64}
+                    />
                     <YAxis tick={{ fontSize: 12, fontWeight: "bold" }} />
                     <Tooltip />
                     <Legend />
@@ -367,17 +593,29 @@ setSpareParts(parsedSpare);
 
           {/* HC OnTime vs Delayed */}
           <div className="bg-white rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100">
-            <h2 className="text-xl font-semibold mb-4 text-black text-center">HC OnTime vs Delayed</h2>
+            <h2 className="text-xl font-semibold mb-4 text-black text-center">
+              HC OnTime vs Delayed
+            </h2>
             <div className="h-[320px]">
               {loadingOnTime ? (
-                <div className="flex items-center justify-center h-full">Loading...</div>
+                <div className="flex items-center justify-center h-full">
+                  Loading...
+                </div>
               ) : hcOnTimeData.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-sm text-gray-600">No HC on-time data for selected mould.</div>
+                <div className="flex items-center justify-center h-full text-sm text-gray-600">
+                  No HC on-time data for selected mould.
+                </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={hcOnTimeData} margin={{ bottom: 20 }}>
                     <CartesianGrid strokeDasharray="4 4" />
-                    <XAxis dataKey="month" tick={{ fontSize: 12, fontWeight: "bold" }} angle={-20} textAnchor="end" height={64} />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fontSize: 12, fontWeight: "bold" }}
+                      angle={-20}
+                      textAnchor="end"
+                      height={64}
+                    />
                     <YAxis tick={{ fontSize: 12, fontWeight: "bold" }} />
                     <Tooltip />
                     <Legend />
@@ -394,12 +632,16 @@ setSpareParts(parsedSpare);
         <div className="grid grid-cols-2 gap-4 mt-6">
           {/* Breakdown by Duration */}
           <div className="bg-white shadow-lg rounded-xl p-4">
-            <h2 className="font-semibold mb-2 text-lg text-black text-center">Top 5 Breakdown by Duration</h2>
+            <h2 className="font-semibold mb-2 text-lg text-black text-center">
+              Top 5 Breakdown by Duration
+            </h2>
 
             {loadingBreakdown ? (
               <div className="p-6 text-center">Loading breakdown...</div>
             ) : breakdownDuration.length === 0 ? (
-              <div className="p-6 text-center text-sm text-gray-600">No breakdown duration data.</div>
+              <div className="p-6 text-center text-sm text-gray-600">
+                No breakdown duration data.
+              </div>
             ) : (
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={breakdownDuration} margin={{ bottom: 20 }}>
@@ -410,9 +652,19 @@ setSpareParts(parsedSpare);
                     textAnchor="end"
                     interval={0}
                     height={60}
-                    tick={{ fontSize: 12, fill: "#181818ff", fontWeight: "bold" }}
+                    tick={{
+                      fontSize: 12,
+                      fill: "#181818ff",
+                      fontWeight: "bold",
+                    }}
                   />
-                  <YAxis tick={{ fontSize: 12, fill: "#181818ff", fontWeight: "bold" }} />
+                  <YAxis
+                    tick={{
+                      fontSize: 12,
+                      fill: "#181818ff",
+                      fontWeight: "bold",
+                    }}
+                  />
                   <Tooltip />
                   <Bar dataKey="duration" fill="#5885E0" />
                 </BarChart>
@@ -422,12 +674,16 @@ setSpareParts(parsedSpare);
 
           {/* Breakdown by Count */}
           <div className="bg-white shadow-lg rounded-xl p-4">
-            <h2 className="font-semibold mb-2 text-lg text-black text-center">Top 5 Breakdown by Occurrence</h2>
+            <h2 className="font-semibold mb-2 text-lg text-black text-center">
+              Top 5 Breakdown by Occurrence
+            </h2>
 
             {loadingBreakdown ? (
               <div className="p-6 text-center">Loading breakdown...</div>
             ) : breakdownOccurrence.length === 0 ? (
-              <div className="p-6 text-center text-sm text-gray-600">No breakdown occurrence data.</div>
+              <div className="p-6 text-center text-sm text-gray-600">
+                No breakdown occurrence data.
+              </div>
             ) : (
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={breakdownOccurrence} margin={{ bottom: 20 }}>
@@ -438,9 +694,19 @@ setSpareParts(parsedSpare);
                     textAnchor="end"
                     interval={0}
                     height={60}
-                    tick={{ fontSize: 12, fill: "#181818ff", fontWeight: "bold" }}
+                    tick={{
+                      fontSize: 12,
+                      fill: "#181818ff",
+                      fontWeight: "bold",
+                    }}
                   />
-                  <YAxis tick={{ fontSize: 12, fill: "#181818ff", fontWeight: "bold" }} />
+                  <YAxis
+                    tick={{
+                      fontSize: 12,
+                      fill: "#181818ff",
+                      fontWeight: "bold",
+                    }}
+                  />
                   <Tooltip />
                   <Bar dataKey="count" fill="#FF8C42" />
                 </BarChart>
@@ -451,21 +717,41 @@ setSpareParts(parsedSpare);
 
         {/* Spare Part Consumption */}
         <div className="bg-white rounded-2xl p-5 mt-10 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100">
-          <h2 className="text-xl font-semibold mb-4 text-black text-center">Top 10 Spare Part Consumption</h2>
+          <h2 className="text-xl font-semibold mb-4 text-black text-center">
+            Top 10 Spare Part Consumption
+          </h2>
 
           {loadingSpare ? (
             <div className="p-6 text-center">Loading spare-part data...</div>
           ) : spareError ? (
             <div className="p-6 text-center text-red-600">{spareError}</div>
           ) : spareParts.length === 0 ? (
-            <div className="p-6 text-center text-sm text-gray-600">No spare part data for selected mould.</div>
+            <div className="p-6 text-center text-sm text-gray-600">
+              No spare part data for selected mould.
+            </div>
           ) : (
             <div className="h-[260px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={spareParts}>
                   <CartesianGrid strokeDasharray="4 4" stroke="#e5e7eb" />
-                  <XAxis dataKey="name" tick={{ fill: "#181818ff", fontSize: 12, fontWeight: "bold" }} angle={-8} textAnchor="end" interval={0} />
-                  <YAxis tick={{ fill: "#181818ff", fontSize: 12, fontWeight: "bold" }} />
+                  <XAxis
+                    dataKey="name"
+                    tick={{
+                      fill: "#181818ff",
+                      fontSize: 12,
+                      fontWeight: "bold",
+                    }}
+                    angle={-8}
+                    textAnchor="end"
+                    interval={0}
+                  />
+                  <YAxis
+                    tick={{
+                      fill: "#181818ff",
+                      fontSize: 12,
+                      fontWeight: "bold",
+                    }}
+                  />
                   <Tooltip cursor={{ fill: "rgba(0,0,0,0.05)" }} />
                   <Bar dataKey="qty" fill="#22A699" radius={[6, 6, 0, 0]} />
                 </BarChart>
