@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
 import DashboardLayout from "../../partials/DashboardLayout";
 import {
   BarChart,
@@ -41,6 +41,10 @@ const HCHistory = () => {
   const [hcTableData, setHcTableData] = useState([]);
   const [loadingTable, setLoadingTable] = useState(false);
   const [tableError, setTableError] = useState(null);
+// ---- MOULD DROPDOWN STATES ----
+const [mouldList, setMouldList] = useState([]);
+const [selectedMould, setSelectedMould] = useState("");
+const [loadingMould, setLoadingMould] = useState(false);
 
   // BASE for API — uses Vite env or fallback to the host you shared
   const BASE = (import.meta.env.VITE_BACKEND_BASE_URL || "http://192.168.1.16:3004/api").replace(/\/+$/, "");
@@ -48,6 +52,7 @@ const HCHistory = () => {
   const HC_TIME_ENDPOINT = `${BASE}/MouldMaintenanceHistoryhc/hcTimeDetails`;
   const HC_DELAY_ENDPOINT = `${BASE}/MouldMaintenanceHistoryhc/hcDelayOnTime`;
   const HC_HISTORY_DETAIL_ENDPOINT = `${BASE}/MouldMaintenanceHistoryhc/hcistoryDetailTable`;
+const MOULD_LIST_ENDPOINT = `${BASE}/MouldSummary/MouldName`;
 
   // helper: normalize date to yyyy-mm-dd for query
   const toISODate = (d) => {
@@ -165,11 +170,28 @@ const HCHistory = () => {
       return { onTime: 0, delayed: 0 };
     }
   };
+//mould dropdown
+  useEffect(() => {
+  fetchMouldList();
+}, []);
 
+const fetchMouldList = async () => {
+  setLoadingMould(true);
+  try {
+    const res = await axios.get(MOULD_LIST_ENDPOINT);
+    const rows = res?.data?.data ?? [];
+    setMouldList(rows);
+  } catch (err) {
+    console.error("Failed to load mould list:", err);
+    setMouldList([]);
+  } finally {
+    setLoadingMould(false);
+  }
+};
   // -----------------------
   // Fetch HC detail table (hcistoryDetailTable)
   // -----------------------
-  const fetchHcDetails = async (start, end) => {
+  const fetchHcDetails = async (start, end , mouldID = "") => {
     setLoadingTable(true);
     setTableError(null);
     try {
@@ -177,6 +199,7 @@ const HCHistory = () => {
       const qs = [];
       if (start) qs.push(`startDate=${encodeURIComponent(start)}`);
       if (end) qs.push(`endDate=${encodeURIComponent(end)}`);
+      if (mouldID) qs.push(`mouldID=${encodeURIComponent(mouldID)}`);
       if (qs.length) url += `?${qs.join("&")}`;
 
       const res = await axios.get(url);
@@ -235,7 +258,7 @@ const HCHistory = () => {
       ]);
 
       // fetch details table (parallel but separate)
-      fetchHcDetails(start, end);
+      fetchHcDetails(start, end,selectedMould);
 
       // update stats UI
       const newStats = [
@@ -255,7 +278,13 @@ const HCHistory = () => {
       setLoadingChart(false);
     }
   };
-
+useEffect(() => {
+  if (rangeStart) {
+    const start = toISODate(rangeStart);
+    const end = rangeEnd ? toISODate(rangeEnd) : "";
+    fetchHcDetails(start, end, selectedMould);
+  }
+}, [selectedMould]);
   return (
     <DashboardLayout>
       <div className="p-6 w-full text-gray-800">
@@ -323,10 +352,41 @@ const HCHistory = () => {
           )}
         </div>
 
-        {/* TABLE SECTION - HC Details */}
-        <div className="bg-white rounded-xl shadow p-6">
-          <h3 className="text-2xl font-bold mb-4 text-black text-center">Mould HC Details</h3>
+            <div className="bg-white rounded-xl shadow p-6">
 
+          {/* Header + Dropdown Row */}
+          <div className="flex justify-between items-center mb-6">
+
+            {/* Left Title */}
+            <h3 className="text-2xl font-semibold text-black">
+              Mould PM Details
+            </h3>
+
+            {/* Right Dropdown */}
+            <div className="flex items-center gap-3">
+              <label className="text-lg font-semibold whitespace-nowrap text-black-700">
+                Select Mould Name
+              </label>
+
+              <select
+                className="border border-gray-300 bg-gray-100 px-4 py-2 rounded-md shadow-sm min-w-[260px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={selectedMould}
+                onChange={(e) => setSelectedMould(e.target.value)}
+              >
+                <option value="">-- Select Mould --</option>
+
+                {loadingMould ? (
+                  <option disabled>Loading...</option>
+                ) : (
+                  mouldList.map((m) => (
+                    <option key={m.MouldID} value={m.MouldID}>
+                      {m.MouldName}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+          </div>
           {loadingTable ? (
             <div className="p-6 flex items-center justify-center">Loading HC details...</div>
           ) : tableError ? (

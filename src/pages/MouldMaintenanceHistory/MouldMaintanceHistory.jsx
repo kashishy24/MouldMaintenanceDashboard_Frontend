@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DashboardLayout from "../../partials/DashboardLayout";
 import {
   BarChart,
@@ -38,13 +38,17 @@ export default function MouldMaintenanceHistory() {
   const [pmTableData, setPmTableData] = useState([]);
   const [loadingTable, setLoadingTable] = useState(false);
   const [tableError, setTableError] = useState(null);
+  // ---- MOULD DROPDOWN STATES ----
+  const [mouldList, setMouldList] = useState([]);
+  const [selectedMould, setSelectedMould] = useState("");
+  const [loadingMould, setLoadingMould] = useState(false);
 
   // BASE (Vite env) - fallback to your local ip (no trailing slash)
   const BASE = (import.meta.env.VITE_BACKEND_BASE_URL || "http://192.168.1.6:3004/api").replace(/\/+$/, "");
   const PM_API_ENDPOINT = `${BASE}/MouldMaintenanceHistoryPM/PmPlannedVsActualCustom`;
   const PM_TIME_ENDPOINT = `${BASE}/MouldMaintenanceHistoryPM/PmTimeDetails`;
   const PM_DELAY_ENDPOINT = `${BASE}/MouldMaintenanceHistoryPM/PmDelayOnTime`;
-
+  const MOULD_LIST_ENDPOINT = `${BASE}/MouldSummary/MouldName`;
   // NEW: PM details table endpoint
   const PM_HISTORY_DETAIL_ENDPOINT = `${BASE}/MouldMaintenanceHistoryPM/PmHistoryDetailTable`;
 
@@ -162,10 +166,30 @@ export default function MouldMaintenanceHistory() {
     }
   };
 
+
+  //----------mouldname dropdown
+  useEffect(() => {
+    fetchMouldList();
+  }, []);
+
+  const fetchMouldList = async () => {
+    setLoadingMould(true);
+    try {
+      const res = await axios.get(MOULD_LIST_ENDPOINT);
+      const rows = res?.data?.data ?? [];
+      setMouldList(rows);
+    } catch (err) {
+      console.error("Failed to load mould list:", err);
+      setMouldList([]);
+    } finally {
+      setLoadingMould(false);
+    }
+  };
+
   // -----------------------
   // FETCH PM DETAILS TABLE (PmHistoryDetailTable)
   // -----------------------
-  const fetchPmDetails = async (start, end) => {
+  const fetchPmDetails = async (start, end, mouldID = "") => {
     setLoadingTable(true);
     setTableError(null);
     try {
@@ -173,6 +197,7 @@ export default function MouldMaintenanceHistory() {
       const qs = [];
       if (start) qs.push(`startDate=${encodeURIComponent(start)}`);
       if (end) qs.push(`endDate=${encodeURIComponent(end)}`);
+      if (mouldID) qs.push(`mouldID=${encodeURIComponent(mouldID)}`);
       if (qs.length) url += `?${qs.join("&")}`;
 
       const res = await axios.get(url);
@@ -234,7 +259,7 @@ export default function MouldMaintenanceHistory() {
 
       // also fetch table (not part of returned Promise results above)
       // we intentionally do it in parallel but after initiating the Promise.all above to keep code straightforward
-      fetchPmDetails(start, end);
+      fetchPmDetails(start, end, selectedMould);
 
       // update stats cards (timeStats then delayStats)
       const newStats = [
@@ -255,6 +280,13 @@ export default function MouldMaintenanceHistory() {
       // Note: table loading state is managed by fetchPmDetails
     }
   };
+  useEffect(() => {
+    if (rangeStart) {
+      const start = toISODate(rangeStart);
+      const end = rangeEnd ? toISODate(rangeEnd) : "";
+      fetchPmDetails(start, end, selectedMould);
+    }
+  }, [selectedMould]);
 
   // local uploaded image path (your tooling will transform into a URL)
   const SAMPLE_IMAGE_URL = "/mnt/data/16ba7035-6471-40fc-963f-93e243f3c1ca.png";
@@ -331,63 +363,125 @@ export default function MouldMaintenanceHistory() {
         </div>
 
         {/* TABLE SECTION */}
+        {/* TABLE SECTION */}
         <div className="bg-white rounded-xl shadow p-6">
-          <h3 className="text-2xl font-medium mb-4 text-black text-center">Mould PM Details</h3>
 
+          {/* Header + Dropdown Row */}
+          <div className="flex justify-between items-center mb-6">
+
+            {/* Left Title */}
+            <h3 className="text-2xl font-semibold text-black">
+              Mould PM Details
+            </h3>
+
+            {/* Right Dropdown */}
+            <div className="flex items-center gap-3">
+              <label className="text-lg font-semibold whitespace-nowrap text-black-700">
+                Select Mould Name
+              </label>
+
+              <select
+                className="border border-gray-300 bg-gray-100 px-4 py-2 rounded-md shadow-sm min-w-[260px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={selectedMould}
+                onChange={(e) => setSelectedMould(e.target.value)}
+              >
+                <option value="">-- Select Mould --</option>
+
+                {loadingMould ? (
+                  <option disabled>Loading...</option>
+                ) : (
+                  mouldList.map((m) => (
+                    <option key={m.MouldID} value={m.MouldID}>
+                      {m.MouldName}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+          </div>
+
+          {/* Table Content */}
           {loadingTable ? (
-            <div className="p-6 flex items-center justify-center">Loading PM details...</div>
+            <div className="p-6 flex items-center justify-center">
+              Loading PM details...
+            </div>
           ) : tableError ? (
-            <div className="text-red-600 p-4">{tableError}</div>
+            <div className="text-red-600 p-4">
+              {tableError}
+            </div>
           ) : (
-            // Outer wrapper: fixed height with scroll
             <div
-              className="w-full"
+              className="w-full border rounded-lg"
               style={{
-                maxHeight: 420, // px - adjust to your preference
-                overflow: "auto", // enables both vertical + horizontal
+                maxHeight: 420,
+                overflow: "auto",
               }}
             >
-              {/* Inner wrapper ensures table can be wider than container to show horizontal scrollbar */}
               <div style={{ minWidth: 1200 }}>
-                <table className="w-full border-collapse">
-                  <thead className="bg-gray-900 text-white text-xs">
-                    <tr>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Checklist</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Instance</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Mould Name</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Material Name</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">User Name</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">PM Status</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Duration (min)</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">At Mould Life</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Start Time</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Remark</th>
-                      <th className="p-3 border whitespace-nowrap sticky top-0 bg-blue-700 text-white z-10">Action</th>
+                <table className="w-full border-collapse text-sm">
+
+                  <thead>
+                    <tr className="bg-blue-700 text-white">
+                      <th className="p-3 border sticky top-0 bg-blue-700 z-10">Checklist</th>
+                      <th className="p-3 border sticky top-0 bg-blue-700 z-10">Instance</th>
+                      <th className="p-3 border sticky top-0 bg-blue-700 z-10">Mould Name</th>
+                      <th className="p-3 border sticky top-0 bg-blue-700 z-10">Material Name</th>
+                      <th className="p-3 border sticky top-0 bg-blue-700 z-10">User Name</th>
+                      <th className="p-3 border sticky top-0 bg-blue-700 z-10">PM Status</th>
+                      <th className="p-3 border sticky top-0 bg-blue-700 z-10">Duration (min)</th>
+                      <th className="p-3 border sticky top-0 bg-blue-700 z-10">At Mould Life</th>
+                      <th className="p-3 border sticky top-0 bg-blue-700 z-10">Start Time</th>
+                      <th className="p-3 border sticky top-0 bg-blue-700 z-10">Remark</th>
+                      <th className="p-3 border sticky top-0 bg-blue-700 z-10">Action</th>
                     </tr>
                   </thead>
 
                   <tbody>
                     {pmTableData.length === 0 ? (
                       <tr>
-                        <td colSpan={11} className="p-4 text-center text-gray-600">No PM history found for selected range.</td>
+                        <td colSpan={11} className="p-4 text-center text-gray-600">
+                          No PM history found for selected range.
+                        </td>
                       </tr>
                     ) : (
                       pmTableData.map((row, index) => (
-                        <tr key={row.key ?? index} className="text-center border ">
-                          <td className="p-3 border text-left whitespace-nowrap text-center font-medium text-black">{row.checkListName}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.instance}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.mouldName}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.materialName}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.userName}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.pmStatus}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.pmDuration}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{row.atMouldLife ?? "-"}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">{formatFriendlyDate(row.startTime)}</td>
-                          <td className="p-3 border text-left whitespace-nowrap text-center font-medium text-black">{row.remark || "-"}</td>
-                          <td className="p-3 border whitespace-nowrap text-center font-medium text-black">
-                            {/* Action button - navigates to PMCheckPointReport with parameters */}
+                        <tr
+                          key={row.key ?? index}
+                          className="text-center border hover:bg-gray-50"
+                        >
+                          <td className="p-3 border font-medium text-black">
+                            {row.checkListName}
+                          </td>
+                          <td className="p-3 border text-black">
+                            {row.instance}
+                          </td>
+                          <td className="p-3 border text-black">
+                            {row.mouldName}
+                          </td>
+                          <td className="p-3 border text-black">
+                            {row.materialName}
+                          </td>
+                          <td className="p-3 border text-black">
+                            {row.userName}
+                          </td>
+                          <td className="p-3 border text-black">
+                            {row.pmStatus}
+                          </td>
+                          <td className="p-3 border text-black">
+                            {row.pmDuration}
+                          </td>
+                          <td className="p-3 border text-black">
+                            {row.atMouldLife ?? "-"}
+                          </td>
+                          <td className="p-3 border text-black">
+                            {formatFriendlyDate(row.startTime)}
+                          </td>
+                          <td className="p-3 border text-black">
+                            {row.remark || "-"}
+                          </td>
+                          <td className="p-3 border">
                             <button
-                              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                               onClick={() =>
                                 navigate(
                                   `/PMCheckPointReport?checkListID=${row.checkListID}
@@ -408,6 +502,7 @@ export default function MouldMaintenanceHistory() {
                       ))
                     )}
                   </tbody>
+
                 </table>
               </div>
             </div>
