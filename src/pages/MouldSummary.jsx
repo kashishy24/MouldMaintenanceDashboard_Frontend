@@ -54,7 +54,7 @@ const MouldSummary = () => {
   const [loadingMachineTable, setLoadingMachineTable] = useState(false);
 
   // ---------------- Machine Dropdown + Table ----------------
-  const [selectedMachine, setSelectedMachine] = useState("ALL");
+  const [selectedMachine, setSelectedMachine] = useState("");
 
 
 
@@ -310,11 +310,11 @@ const MouldSummary = () => {
               }));
 
               setMachineList(parsedMachines);
-              setSelectedMachine("All");   // reset selection
+              setSelectedMachine("");   // reset selection
 
-              handleMachineChange({
-                target: { value: "All" }
-              });
+              // handleMachineChange({
+              //   target: { value: "All" }
+              // });
               setMachineTableData([]);  // clear table
 
             } catch (err) {
@@ -585,8 +585,10 @@ const MouldSummary = () => {
               <select
                 value={selectedMachine}
                 onChange={handleMachineChange}
+                 disabled={!selectedMould}
                 className="border border-gray-300 px-4 py-2 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:outline-none bg-gray-50 min-w-[200px]"
               >
+              <option value="">Select Machine</option>
                 <option value="All">All</option>
 
                 {machineList.map((machine) => (
