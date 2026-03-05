@@ -310,7 +310,11 @@ const MouldSummary = () => {
               }));
 
               setMachineList(parsedMachines);
-              setSelectedMachine("");   // reset selection
+              setSelectedMachine("All");   // reset selection
+
+              handleMachineChange({
+                target: { value: "All" }
+              });
               setMachineTableData([]);  // clear table
 
             } catch (err) {
@@ -375,9 +379,10 @@ const MouldSummary = () => {
   ];
   const handleMachineChange = async (e) => {
     const machineName = e.target.value;
+
     setSelectedMachine(machineName);
 
-    if (!machineName) {
+    if (!machineName || !mouldInfo.MouldID) {
       setMachineTableData([]);
       return;
     }
@@ -388,7 +393,10 @@ const MouldSummary = () => {
       const res = await axios.get(
         `${BASE}/MouldSummary/Dashboard_GET_MachineMouldProductionDetails`,
         {
-          params: { equipmentName: machineName },
+          params: {
+            mouldID: mouldInfo.MouldID,
+            equipmentName: machineName
+          },
         }
       );
 
@@ -579,7 +587,7 @@ const MouldSummary = () => {
                 onChange={handleMachineChange}
                 className="border border-gray-300 px-4 py-2 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:outline-none bg-gray-50 min-w-[200px]"
               >
-                <option value="">-- Select Machine --</option>
+                <option value="All">All</option>
 
                 {machineList.map((machine) => (
                   <option key={machine.id} value={machine.name}>
