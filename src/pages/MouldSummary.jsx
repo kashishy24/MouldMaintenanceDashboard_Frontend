@@ -14,7 +14,7 @@ import {
   Cell,
   Legend,
 } from "recharts";
-
+import Select from "react-select";
 // normalize BASE (remove trailing slash)
 const BASE = (import.meta.env.VITE_BACKEND_BASE_URL || "").replace(/\/+$/, "");
 
@@ -56,33 +56,7 @@ const MouldSummary = () => {
   // ---------------- Machine Dropdown + Table ----------------
   const [selectedMachine, setSelectedMachine] = useState("ALL");
 
-  //const machineList = ["MC-101", "MC-102", "MC-103", "MC-104"];
 
-  // const machineTableData = [
-  //   {
-  //     machine: "MC-101",
-  //     mouldId: "M-01",
-  //     loadingTime: "10 Feb 2026 08:30 AM",
-  //     unloadingTime: "15 Feb 2026 05:45 PM",
-  //     loadingShot: 5000,
-  //     unloadingShot: 12500,
-  //   },
-  //   {
-  //     machine: "MC-102",
-  //     mouldId: "M-01",
-  //     loadingTime: "05 Feb 2026 09:15 AM",
-  //     unloadingTime: "12 Feb 2026 06:10 PM",
-  //     loadingShot: 4000,
-  //     unloadingShot: 9800,
-  //   },
-  // ];
-
-  // const filteredMachineData =
-  //   selectedMachine === "ALL"
-  //     ? machineTableData
-  //     : machineTableData.filter(
-  //       (row) => row.machine === selectedMachine
-  //     );
 
   // ---------------- Fetch mould list on load ----------------
   useEffect(() => {
@@ -448,21 +422,52 @@ const MouldSummary = () => {
           <div className="grid grid-cols-3 gap-6">
             {/* --- Mould Name Dropdown --- */}
             <div>
-              <label className="font-semibold text-gray-700 mb-1 block">
+              <label className="font-semibold text-black-900 mb-1 block">
                 Select Mould
               </label>
-              <select
-                className="w-full border border-gray-300 px-4 py-3 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none bg-gray-50 text-black"
-                value={selectedMould}
-                onChange={handleMouldChange}
-              >
-                <option value="">-- Select Mould --</option>
-                {mouldList.map((m, i) => (
-                  <option key={i} value={m.MouldName}>
-                    {m.MouldName} ({m.MouldID})
-                  </option>
-                ))}
-              </select>
+              <Select
+                options={mouldList.map((m) => ({
+                  value: m.MouldName,
+                  label: `${m.MouldName} (${m.MouldID})`,
+                  mouldID: m.MouldID,
+                  mouldDesc: m.MouldDesc,
+                }))}
+
+                value={
+                  selectedMould
+                    ? mouldList
+                      .map((m) => ({
+                        value: m.MouldName,
+                        label: `${m.MouldName} (${m.MouldID})`,
+                        mouldID: m.MouldID,
+                        mouldDesc: m.MouldDesc,
+                      }))
+                      .find((opt) => opt.value === selectedMould) || null
+                    : null
+                }
+
+                onChange={(selectedOption) => {
+                  if (!selectedOption) {
+                    handleMouldChange({ target: { value: "" } });
+                    return;
+                  }
+
+                  handleMouldChange({
+                    target: { value: selectedOption.value },
+                  });
+                }}
+
+                isSearchable
+                isClearable
+                placeholder="Type to search mould..."
+
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                }}
+              />
             </div>
 
             {/* --- Mould ID --- */}

@@ -12,7 +12,7 @@ import {
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import Select from "react-select";
 export default function MouldMaintenanceHistory() {
   const navigate = useNavigate();
 
@@ -375,28 +375,45 @@ export default function MouldMaintenanceHistory() {
             </h3>
 
             {/* Right Dropdown */}
-            <div className="flex items-center gap-3">
-              <label className="text-lg font-semibold whitespace-nowrap text-black-700">
+       <div className="flex items-center gap-3">
+              <label className="text-lg font-semibold whitespace-nowrap text-black">
                 Select Mould Name
               </label>
 
-              <select
-                className="border border-gray-300 bg-gray-100 px-4 py-2 rounded-md shadow-sm min-w-[260px] focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={selectedMould}
-                onChange={(e) => setSelectedMould(e.target.value)}
-              >
-                <option value="">-- Select Mould --</option>
+              <div className="min-w-[300px]">
+                <Select
+                  options={mouldList.map((m) => ({
+                    value: m.MouldID,
+                    label: m.MouldName,
+                  }))}
 
-                {loadingMould ? (
-                  <option disabled>Loading...</option>
-                ) : (
-                  mouldList.map((m) => (
-                    <option key={m.MouldID} value={m.MouldID}>
-                      {m.MouldName}
-                    </option>
-                  ))
-                )}
-              </select>
+                  value={
+                    selectedMould
+                      ? {
+                        value: selectedMould,
+                        label:
+                          mouldList.find((m) => m.MouldID === selectedMould)
+                            ?.MouldName || "",
+                      }
+                      : null
+                  }
+
+                  onChange={(selectedOption) =>
+                    setSelectedMould(selectedOption ? selectedOption.value : "")
+                  }
+
+                  isLoading={loadingMould}
+                  isClearable
+                  placeholder="Type to search mould..."
+
+                  menuPortalTarget={document.body}   // 🔥 important
+                  menuPosition="fixed"               // 🔥 important
+
+                  styles={{
+                    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                  }}
+                />
+              </div>
             </div>
           </div>
 
