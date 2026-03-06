@@ -16,7 +16,8 @@ import SparePartHistory from "../pages/MouldMaintenanceHistory/SparePartHistory.
 import Parameters from "../pages/Parameters.jsx";
 import PMCheckPointReport from "../pages/MouldMaintenanceHistory/PMCheckPointReport.jsx";
 import HCCheckpointReport from "../pages/MouldMaintenanceHistory/HCCheckpointReport.jsx";
-
+import PMCheckpointImages from "../pages/MouldMaintenanceHistory/PMCheckpointImage.jsx";
+import HCCheckpointImages from "../pages/MouldMaintenanceHistory/HCCheckpointImage.jsx";
 export default function AppRoutes() {
   return (
     <Routes>
@@ -127,7 +128,22 @@ export default function AppRoutes() {
           </PrivateRoute>
         }
       />
-
+<Route
+  path="/PMCheckpointImages"
+  element={
+    <PrivateRoute>
+      <PMCheckpointImages />
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/HCCheckpointImages"
+  element={
+    <PrivateRoute>
+      <HCCheckpointImages />
+    </PrivateRoute>
+  }
+/>
       {/* Catch-all route */}
       <Route path="*" element={<Error />} />
     </Routes>

@@ -395,6 +395,16 @@ export default function PMCheckPointReport() {
                 📄 PDF
               </button>
 
+<button
+  onClick={() =>
+    navigate(`/PMCheckpointImages?checkListID=${checkListID}&instance=${instance}`)
+  }
+  className="px-4 py-2 bg-indigo-600 text-white rounded-xl 
+  hover:bg-indigo-700 transition shadow-md"
+>
+  🖼 View Images
+</button>
+
               <button
                 onClick={() => navigate(-1)}
                 className="px-4 py-2 bg-gray-600 text-white rounded-xl 
