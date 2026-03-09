@@ -373,7 +373,9 @@ export default function HCCheckPointReport() {
               </button>
               <button
                 onClick={() =>
-                  navigate(`/HCCheckpointImages?checkListID=${checkListID}&instance=${instance}`)
+                  navigate(
+                    `/HCCheckpointImages?mouldName=${encodeURIComponent(mouldName)}&instance=${instance}`,
+                  )
                 }
                 className="px-4 py-2 bg-indigo-600 text-white rounded-xl 
   hover:bg-indigo-700 transition shadow-md"

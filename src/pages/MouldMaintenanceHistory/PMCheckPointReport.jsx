@@ -397,7 +397,9 @@ export default function PMCheckPointReport() {
 
 <button
   onClick={() =>
-    navigate(`/PMCheckpointImages?checkListID=${checkListID}&instance=${instance}`)
+    navigate(
+      `/PMCheckpointImages?mouldName=${encodeURIComponent(mouldName)}&instance=${instance}`,
+    )
   }
   className="px-4 py-2 bg-indigo-600 text-white rounded-xl 
   hover:bg-indigo-700 transition shadow-md"
